@@ -1,4 +1,5 @@
 __Table I. Variables used in the analysis__
+
 | feature | source |feature (lit) | description |
 |----|-----|-----|----|
 | YEAR | _CAIC_ |  YEAR | |
@@ -27,6 +28,6 @@ other: features based on storms
 
  - STMSTK Storm stake: depth of new snow in previous storm
 
-other: dont apply to this model 
+other: dont apply to this model
  - HAZARD Hazard rating of avalanche forecasters
  - NART Number of artificial explosives used
