@@ -1,39 +1,44 @@
 import pandas as pd
+import numpy as np
 
-def oversample(data_df):
+def oversample(data_df, colname, n=4):
 
-    ''' oversample days with many avalanches '''
+    ''' oversample data based on column name
+    input: pandas dataframe
+    output: pandas dataframe, shuffled
+    '''
 
-    # frequency of avys/day:
-    # n = 2004
-    #  {0: 1533, 1: 381, 2: 42, 3: 20, 4: 7, 5: 12, 6: 8, 7: 0}
+    mini_dfs = []
+    for i in range(n+1):
+        mini_dfs.append(data_df[data_df[colname] == i])
 
-    avy0 = data_df[data_df.D2_up == 0]
-    avy1 = data_df[data_df.D2_up == 1]
-    avy2 = data_df[data_df.D2_up == 2]
-    avy3 = data_df[data_df.D2_up == 3]
-    avy4 = data_df[data_df.D2_up == 4]
-    avy5 = data_df[data_df.D2_up == 5]
-    avy6 = data_df[data_df.D2_up == 6]
 
-    n_avy = [0,1,2,3,4,5,6]
+    # avy0 = data_df[data_df[colname] == 0]
+    # avy1 = data_df[data_df[colname] == 1]
+    # avy2 = data_df[data_df[colname] == 2]
+    # avy3 = data_df[data_df[colname] == 3]
+    # avy4 = data_df[data_df[colname] == 4]
+    # avy5 = data_df[data_df[colname] == 5]
+    # avy6 = data_df[data_df[colname] == 6]
+
+    #n_avy = [0,1,2,3,4,5,6]
     counts = {}
-    for n in n_avy:
-        counts[n] = data_df[data_df.D2_up == n].count().max()
+    for x in range(n+1):
+        counts[x] = data_df[data_df[colname] == x].count().max()
 
     # duplication factors
     # {2: 9, 3: 19, 4: 54, 5: 31, 6: 47}
     factors = {}
-    for n in n_avy: # no 7 b/c 0
-        factors[n] = counts[0]//counts[n]
+    for x in range(x+1): # no 7 b/c 0
+        factors[x] = counts[0]//counts[x]
 
     # concatenate to dataframe
-    mini_dfs = [avy0, avy1, avy2, avy3, avy4, avy5, avy6]
-    frames = []
-    for n in factors.keys():
+    #mini_dfs = [avy0, avy1, avy2, avy3, avy4, avy5, avy6]
+    frames = [data_df]
+    for x in factors.keys():
         i = 0
-        while i <= factors[n]:
-            frames.append(mini_dfs[n])
+        while i <= factors[x]:
+            frames.append(mini_dfs[x])
             i += 1
 
     df = pd.concat(frames, axis=0)
@@ -42,4 +47,4 @@ def oversample(data_df):
     df_shuffle = df.copy()
     df_shuffle.set_index(np.random.permutation(df_shuffle.index), inplace=True)
 
-    return df_shuffle
+    return df_shuffle, counts, factors

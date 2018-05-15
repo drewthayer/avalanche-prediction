@@ -9,6 +9,8 @@ import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
+# import transformations
+from transformation_scripts import oversample
 
 def feat_importance_plot(model,names,filename,color='g',alpha=0.5,fig_size=(10,10),dpi=250):
     '''
@@ -42,7 +44,7 @@ def feat_importance_plot(model,names,filename,color='g',alpha=0.5,fig_size=(10,1
 ''' model data '''
 if __name__=='__main__':
     # load data
-    data_df = pickle.load( open( 'pkl/aspen_1.p', 'rb'))
+    data_df = pickle.load( open( 'pkl/aspen_d2_spring.p', 'rb'))
     # the dreaded fill with 0
     data_df.fillna(0, inplace=True)
 
@@ -51,9 +53,10 @@ if __name__=='__main__':
     train_df = data_df[data_df.index <= splitdate]
     test_df = data_df[data_df.index > splitdate]
 
-    # oversample days with avalanches to balance classes
-    #unshuffled, train_shuffle = oversample(train_df)
-    train_shuffle = train_df
+    # oversample train data
+    train_shuffle, counts, factors = oversample(train_df, 'N_AVY', n=15)
+    #pickle.dump( oversamp_df, open( "pkl/aspen_oversamp6.p", "wb" ) )
+    #train_shuffle = train_df
 
     ''' select features and target X,y '''
     # define target and remove target nans
@@ -83,7 +86,7 @@ if __name__=='__main__':
     rfr_feats = sorted(zip(X_train.columns, importances_rfr), key=lambda x:abs(x[1]), reverse=True)
     # predictions
     preds_rfr = rfr.predict(X_test)
-    rmse = np.sqrt(np.sum((y_test - preds_rfr)**2))
+    rmse = np.sqrt(np.sum((y_test - preds_rfr)**2)/len(y_test))
     print('rfr test rmse = {:0.3f}'.format(rmse))
 
     # plot
@@ -93,9 +96,23 @@ if __name__=='__main__':
     ax.set_ylabel('daily # of avalanches')
     ax.set_title('Aspen, CO: avalanches >= D2')
     ax.legend()
-    plt.show()
+    plt.savefig('../figs/rfr_d2_spring.png', dpi=250)
+    plt.close()
 
     # feature importance plot
     names = X_train.columns
-    filename = 'rfr_test1'
+    filename = '../figs/rfr_d2_spring_feats.png'
     feat_importance_plot(rfr,names,filename,color='g',alpha=0.5,fig_size=(10,10),dpi=250)
+
+    # ''' test: simple model with only DSUM '''
+    # # define target and remove target nans
+    # ycol = 'N_AVY'
+    # xcol = 'D_SUM'
+    # # train set
+    # X_train = train_shuffle.copy()
+    # y_train = X_train.pop(ycol)
+    # X_train = X_train[xcol]
+    # # test set
+    # X_test = test_df.copy()
+    # y_test = X_test.pop(ycol)
+    # X_test = X_test[xcol]
