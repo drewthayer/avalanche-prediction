@@ -5,7 +5,9 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
+from scipy.stats import gaussian_kde
 
+from transformation_scripts import water_year_day, water_year_month
 
 def engineer_avy_df(avy_df, bc_zone, min_dsize=2):
     # D scale to ordinal
@@ -22,12 +24,12 @@ def engineer_avy_df(avy_df, bc_zone, min_dsize=2):
     # n avalanches
     zone_df['N_AVY'] = subset['N_AVY'].sum()
     zone_df['dt'] = pd.to_datetime(zone_df.index)
-    # month, day-of-year
-    zone_df['MONTH'] = zone_df['dt'].dt.month
-    zone_df['DOY'] = zone_df['dt'].apply(lambda x: x.timetuple().tm_yday)
-    # spring feature
-    zone_df['SPRING'] = np.where(zone_df.MONTH >= 4, 1, 0)
-
+    # water year month
+    month = zone_df['dt'].dt.month
+    zone_df['MONTH'] = month.apply(lambda x: water_year_month(x))
+    # day of water year
+    doy = zone_df['dt'].apply(lambda x: x.timetuple().tm_yday)
+    zone_df['DOY'] = doy.apply(lambda x: water_year_day(x))
     # n_avy in last 24 hours
     temp = zone_df['N_AVY'].values
     temp = np.insert(temp,0,0)
@@ -39,12 +41,26 @@ def engineer_avy_df(avy_df, bc_zone, min_dsize=2):
     temp = np.insert(temp,0,0)
     temp = np.delete(temp, -1)
     zone_df['DSUM_24'] = temp
+    # kde probabilities of slab/wet
+    probs = pickle.load( open( 'pkl/kde_probs.p', 'rb'))
+    p_slab = probs[0]
+    p_wet = probs[1]
+    zone_df['P_SLAB'] = zone_df.DOY.apply(lambda x: p_slab[x])
+    zone_df['P_WET'] = zone_df.DOY.apply(lambda x: p_wet[x])
+    # features: slab, wet
+    zone_df['Type'] = subset.Type
+    tmp = zone_df.Type
+    wet = tmp.apply(lambda x: 1 if 'WL' in set(x[1]) else 0)
+    slab = tmp.apply(lambda x: 1 if ('HS' in set(x[1])) or ('SS' in set(x[1])) else 0)
+    zone_df['WET'] = wet
+    zone_df['SLAB'] = slab
 
     # set index to timstamp object
     zone_df.set_index(zone_df['dt'], inplace=True)
     zone_df.drop('dt', axis=1, inplace=True)
 
-    cols_to_keep = ['N_AVY','MONTH','DOY','SPRING','N_AVY_24','DSUM_24']
+    cols_to_keep = ['N_AVY','MONTH','DOY','N_AVY_24','DSUM_24','P_SLAB','P_WET',
+                    'WET', 'SLAB']
     out = zone_df[cols_to_keep]
 
     return out
@@ -140,6 +156,7 @@ if __name__=='__main__':
 
     # engineer CAIC data
     zone_df = engineer_avy_df(avy_df, 'Aspen', min_dsize=2)
+
     # time range:
     start_date = zone_df.index.min()
     end_date = zone_df.index.max()
@@ -182,4 +199,16 @@ if __name__=='__main__':
     test_nans = np.sum(merge_all.isna())
 
     ''' save to pickle '''
-    pickle.dump( merge_all, open( "pkl/aspen_d2_spring.p", "wb" ) )
+    pickle.dump( merge_all, open( "pkl/aspen_d2_slabwet_labeled.p", "wb" ) )
+
+    # diagnostics
+    fig, ax = plt.subplots(1,2, figsize=(8,4))
+    ax[0].plot(merge_all.P_SLAB, merge_all.SLAB, 'ok')
+    ax[0].set_title('slab avalanche')
+    ax[0].set_xlabel('p(slab)')
+    ax[0].set_ylabel('events')
+    ax[1].plot(merge_all.P_WET, merge_all.WET, 'ok')
+    ax[1].set_title('wet avalanche')
+    ax[1].set_xlabel('p(wet)')
+    plt.tight_layout()
+    plt.show()

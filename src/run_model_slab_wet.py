@@ -3,8 +3,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.metrics import accuracy_score
 import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
@@ -16,9 +18,19 @@ from plotting_scripts import feat_importance_plot
 
 if __name__=='__main__':
     # load data
-    data_df = pickle.load( open( 'pkl/aspen_d2_slabwet.p', 'rb'))
+    data_df = pickle.load( open( 'pkl/aspen_d2_slabwet_labeled.p', 'rb'))
     # the dreaded fill with 0
     data_df.fillna(0, inplace=True)
+
+    ''' N_AVY when case = slab/wet '''
+    # drop 'N_AVY column'
+    # drop other binary column
+    data_df.drop('WET', axis=1, inplace=True)
+    # create target column
+    data_df['Target'] = data_df.N_AVY * data_df.SLAB
+    ycol = 'Target'
+    # drop related columns
+    data_df.drop('N_AVY', axis=1, inplace=True)
 
     # train test split in time
     splitdate = pd.to_datetime('2016-06-01')
@@ -26,13 +38,15 @@ if __name__=='__main__':
     test_df = data_df[data_df.index > splitdate]
 
     # oversample train data
-    train_shuffle, counts, factors = oversample(train_df, 'N_AVY', n=15)
+    n=15
+    train_shuffle, counts, factors = oversample(train_df, 'Target', n=n)
+    print('oversample to n = {}'.format(n))
     #pickle.dump( oversamp_df, open( "pkl/aspen_oversamp6.p", "wb" ) )
     #train_shuffle = train_df
 
     ''' select features and target X,y '''
     # define target and remove target nans
-    ycol = 'N_AVY'
+
     # train set
     X_train = train_shuffle.copy()
     y_train = X_train.pop(ycol)
@@ -58,8 +72,11 @@ if __name__=='__main__':
     rfr_feats = sorted(zip(X_train.columns, importances_rfr), key=lambda x:abs(x[1]), reverse=True)
     # predictions
     preds_rfr = rfr.predict(X_test)
+
     rmse = np.sqrt(np.sum((y_test - preds_rfr)**2)/len(y_test))
     print('rfr test rmse = {:0.3f}'.format(rmse))
+    #score = accuracy_score(y_test, preds_rfr)
+    #print('rfr test accuracy = {:0.3f}'.format(score))
 
     # plot
     fig, ax = plt.subplots(1,1,figsize=(6,4))
@@ -68,13 +85,14 @@ if __name__=='__main__':
     ax.set_ylabel('daily # of avalanches')
     ax.set_title('Aspen, CO: avalanches >= D2')
     ax.legend()
-    plt.savefig('../figs/rfr_d2_slabwet.png', dpi=250)
-    plt.close()
+    plt.show()
+    #plt.savefig('../figs/rfr_d2_slabwet.png', dpi=250)
+    #plt.close()
 
     # feature importance plot
     names = X_train.columns
     filename = '../figs/rfr_d2_slabwet_feats.png'
-    feat_importance_plot(rfr,names,filename,color='g',alpha=0.5,fig_size=(10,10),dpi=250)
+    #feat_importance_plot(rfr,names,filename,color='g',alpha=0.5,fig_size=(10,10),dpi=250)
 
     # ''' test: simple model with only DSUM '''
     # # define target and remove target nans

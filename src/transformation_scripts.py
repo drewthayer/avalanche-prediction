@@ -1,6 +1,20 @@
 import pandas as pd
 import numpy as np
 
+def water_year_month(month):
+    if month >= 10:
+        month2 = month - 9
+    else:
+        month2 = month + 3
+    return month2
+
+def water_year_day(day):
+    if day >= 273:
+        day2 = day - 273
+    else:
+        day2 = day + 92
+    return day2
+
 def oversample(data_df, colname, n=4):
 
     ''' oversample data based on column name
