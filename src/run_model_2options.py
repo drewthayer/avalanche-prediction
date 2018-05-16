@@ -16,6 +16,7 @@ from transformation_scripts import oversample
 from plotting_scripts import feat_importance_plot
 
 def run_model(df, cases, n_oversamps, c_true, c_pred, model):
+    y_true = []
     preds = []
     n_avy = df.N_AVY
     # drop related columns
@@ -30,7 +31,7 @@ def run_model(df, cases, n_oversamps, c_true, c_pred, model):
         # create target column
         data_df['Target'] = n_avy * data_df[case[0]]
         ycol = 'Target'
-        # drop target binary column 
+        # drop target binary column
         data_df.drop(case[0], axis=1, inplace=True)
 
         # train test split in time
@@ -64,7 +65,9 @@ def run_model(df, cases, n_oversamps, c_true, c_pred, model):
         rfr_feats = sorted(zip(X_train.columns, importances_rfr), key=lambda x:abs(x[1]), reverse=True)
         # predictions
         preds_rfr = model.predict(X_test)
+        # save true, predicted for return
         preds.append(preds_rfr)
+        y_true.append(y_test)
 
         rmse = np.sqrt(np.sum((y_test - preds_rfr)**2)/len(y_test))
         print('test rmse = {:0.3f}'.format(rmse))
@@ -91,8 +94,24 @@ def run_model(df, cases, n_oversamps, c_true, c_pred, model):
     #plt.savefig('../figs/rfr_d2_slabwet.png', dpi=250)
     #plt.close()
 
-    return preds
+    return y_true, preds
 
+def output_histograms(y_true, preds):
+    fig, ax = plt.subplots(1,2, figsize=(12,6))
+    ax[0].hist(y_true[0][y_true[0] > 0],20, color='b', label='true')
+    ax[0].hist(preds[0][preds[0] > 0],20, color='g', label='predicted')
+    ax[0].set_title('slab')
+    ax[0].set_xlabel('# of avalanches')
+    ax[0].set_ylabel('count')
+
+    ax[1].hist(y_true[1][y_true[1] > 0],20, color='b', label='true')
+    ax[1].hist(preds[1][preds[1] > 0],20, color='g', label='predicted')
+    ax[1].set_title('wet')
+    ax[1].set_xlabel('# of avalanches')
+    ax[1].set_ylabel('count')
+
+    plt.legend()
+    plt.show()
 
 if __name__=='__main__':
     # load data
@@ -116,7 +135,11 @@ if __name__=='__main__':
         'oob_score':True}
     rfr = RandomForestRegressor(**best_params)
 
-    preds = run_model(df, cases, n_oversamps, c_true, c_pred, model=rfr)
+    y_true, preds = run_model(df, cases, n_oversamps, c_true, c_pred, model=rfr)
+
+
+
+    output_histograms(y_true, preds)
     # ''' test: simple model with only DSUM '''
     # # define target and remove target nans
     # ycol = 'N_AVY'

@@ -152,7 +152,7 @@ rfr test rmse = 3.993
 case: SLAB
 oversample to n = 15
 out-of-bag train score = 0.989
-test rmse = 3.580
+test rmse = 3.580 (compare to 3.63 for just adding ps, one model )
 case: WET
 oversample to n = 6
 out-of-bag train score = 0.958
