@@ -1,7 +1,13 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 def feat_importance_plot(model,names,filename,color='g',alpha=0.5,fig_size=(10,10),dpi=250):
     '''
     horizontal bar plot of feature importances
     works for sklearn models that have a .feature_importances_ method (e.g. RandomForestRegressor)
+    required packages:
+        numpy, matplotlib.pyplot
+
     imputs
     ------
     model:    class:     a fitted sklearn model
@@ -24,4 +30,4 @@ def feat_importance_plot(model,names,filename,color='g',alpha=0.5,fig_size=(10,1
     plt.ylabel('Feature Name', fontsize=14)
     plt.tight_layout()
     plt.savefig(filename,dpi=dpi)
-    plt.show()
+    plt.close()
