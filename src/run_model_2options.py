@@ -15,18 +15,7 @@ import numpy as np
 from transformation_scripts import oversample
 from plotting_scripts import feat_importance_plot
 
-
-if __name__=='__main__':
-    # load data
-    df = pickle.load( open( 'pkl/aspen_d2_slabwet_labeled.p', 'rb'))
-    # the dreaded fill with 0
-    df.fillna(0, inplace=True)
-
-    ''' N_AVY when case = slab/wet '''
-    cases = [['SLAB','WET'], ['WET','SLAB']]
-    n_oversamps = [15, 6]
-    c_true = ['b','g']
-    c_pred = ['r','orange']
+def run_model(df, cases, n_oversamps, c_true, c_pred, model):
     preds = []
     n_avy = df.N_AVY
     # drop related columns
@@ -41,6 +30,8 @@ if __name__=='__main__':
         # create target column
         data_df['Target'] = n_avy * data_df[case[0]]
         ycol = 'Target'
+        # drop target binary column 
+        data_df.drop(case[0], axis=1, inplace=True)
 
         # train test split in time
         splitdate = pd.to_datetime('2016-06-01')
@@ -55,8 +46,6 @@ if __name__=='__main__':
         #train_shuffle = train_df
 
         ''' select features and target X,y '''
-        # define target and remove target nans
-
         # train set
         X_train = train_shuffle.copy()
         y_train = X_train.pop(ycol)
@@ -66,30 +55,27 @@ if __name__=='__main__':
         # datetime for plot
         test_datetime = pd.to_datetime(X_test.index)
 
-        ''' random forest '''
-        best_params = {'criterion': 'mse',
-            'max_depth': 14,
-            'max_features': 'auto',
-            'min_samples_leaf': 2,
-            'min_samples_split': 4,
-            'n_estimators': 500,
-            'n_jobs': -1,
-            'oob_score':True}
-        rfr = RandomForestRegressor(**best_params)
-        rfr.fit(X_train, y_train)
+        ''' run model '''
+        model.fit(X_train, y_train)
         # metrics
-        oob = rfr.oob_score_
-        print('rfr out-of-bag train score = {:0.3f}'.format(oob))
-        importances_rfr = rfr.feature_importances_
+        oob = model.oob_score_
+        print('out-of-bag train score = {:0.3f}'.format(oob))
+        importances_rfr = model.feature_importances_
         rfr_feats = sorted(zip(X_train.columns, importances_rfr), key=lambda x:abs(x[1]), reverse=True)
         # predictions
-        preds_rfr = rfr.predict(X_test)
+        preds_rfr = model.predict(X_test)
         preds.append(preds_rfr)
 
         rmse = np.sqrt(np.sum((y_test - preds_rfr)**2)/len(y_test))
-        print('rfr test rmse = {:0.3f}'.format(rmse))
+        print('test rmse = {:0.3f}'.format(rmse))
         #score = accuracy_score(y_test, preds_rfr)
         #print('rfr test accuracy = {:0.3f}'.format(score))
+
+        # feature importance plot
+        names = X_train.columns
+        filename = '../figs/rfr_d2_2models_{}.png'.format(case[0])
+        feat_importance_plot(model,names,filename,color='g',
+            alpha=0.5,fig_size=(10,10),dpi=250)
 
         # plot
         h1 = ax.plot(test_datetime,y_test,c_true[idx],
@@ -105,11 +91,32 @@ if __name__=='__main__':
     #plt.savefig('../figs/rfr_d2_slabwet.png', dpi=250)
     #plt.close()
 
-    # feature importance plot
-    names = X_train.columns
-    filename = '../figs/rfr_d2_slabwet_feats.png'
-    #feat_importance_plot(rfr,names,filename,color='g',alpha=0.5,fig_size=(10,10),dpi=250)
+    return preds
 
+
+if __name__=='__main__':
+    # load data
+    df = pickle.load( open( 'pkl/aspen_d2_slabwet_labeled.p', 'rb'))
+    # the dreaded fill with 0
+    df.fillna(0, inplace=True)
+
+    ''' N_AVY when case = slab/wet '''
+    cases = [['SLAB','WET'], ['WET','SLAB']]
+    n_oversamps = [15, 6]
+    c_true = ['b','g']
+    c_pred = ['r','orange']
+
+    best_params = {'criterion': 'mse',
+        'max_depth': 14,
+        'max_features': 'auto',
+        'min_samples_leaf': 2,
+        'min_samples_split': 4,
+        'n_estimators': 500,
+        'n_jobs': -1,
+        'oob_score':True}
+    rfr = RandomForestRegressor(**best_params)
+
+    preds = run_model(df, cases, n_oversamps, c_true, c_pred, model=rfr)
     # ''' test: simple model with only DSUM '''
     # # define target and remove target nans
     # ycol = 'N_AVY'

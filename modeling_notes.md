@@ -147,3 +147,13 @@ rfr test rmse = 3.996 (BUT gets high numbers)
 oversample to n = 25
 rfr out-of-bag train score = 0.999
 rfr test rmse = 3.993
+
+#### two models: one for slab, one for wet
+case: SLAB
+oversample to n = 15
+out-of-bag train score = 0.989
+test rmse = 3.580
+case: WET
+oversample to n = 6
+out-of-bag train score = 0.958
+test rmse = 2.300
