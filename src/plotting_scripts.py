@@ -31,3 +31,20 @@ def feat_importance_plot(model,names,filename,color='g',alpha=0.5,fig_size=(10,1
     plt.tight_layout()
     plt.savefig(filename,dpi=dpi)
     plt.close()
+
+def output_histograms(y_true, preds):
+    fig, ax = plt.subplots(1,2, figsize=(12,6))
+    ax[0].hist(y_true[0][y_true[0] > 0],20, color='b', label='true')
+    ax[0].hist(preds[0][preds[0] > 0],20, color='g', label='predicted')
+    ax[0].set_title('slab')
+    ax[0].set_xlabel('# of avalanches')
+    ax[0].set_ylabel('count')
+
+    ax[1].hist(y_true[1][y_true[1] > 0],20, color='b', label='true')
+    ax[1].hist(preds[1][preds[1] > 0],20, color='g', label='predicted')
+    ax[1].set_title('wet')
+    ax[1].set_xlabel('# of avalanches')
+    ax[1].set_ylabel('count')
+
+    plt.legend()
+    plt.show()
