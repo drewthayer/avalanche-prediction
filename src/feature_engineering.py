@@ -16,7 +16,7 @@ def engineer_avy_df(avy_df, bc_zone, min_dsize=2):
     tmp = tmp.apply(lambda x: "D0" if x == "U" else x )
     avy_df['D'] = tmp.apply(lambda x: float(x.split("D")[1]))
 
-    # could do this with ordinal "D" now
+    # select avalanches > min_dize
     avy_df['N_AVY'] = np.where(avy_df.D >= min_dsize, avy_df['#'], 0)
 
     # new dataframe and groupby object
@@ -215,14 +215,14 @@ if __name__=='__main__':
     snow_df = snow_df[snow_df.STATION == '542']
 
     ''' assemble feature matrix '''
-    merge = pd.merge(zone_df, wind_df, how='left', left_index=True, right_index=True)
-    merge_all = pd.merge(merge, snow_df, how='left', left_index=True, right_index=True)
+    merge = pd.merge(snow_df, wind_df, how='left', left_index=True, right_index=True)
+    merge_all = pd.merge(merge, zone_df, how='left', left_index=True, right_index=True)
 
     # remove non-numeric columns
     merge_all.drop('STATION', axis=1, inplace=True)
 
-    merge_imputed = df_simple_impute(merge_all, method='mean')
+    merge_imputed = df_simple_impute(merge_all, method='zero')
 
 
     ''' save to pickle '''
-    pickle.dump( merge_imputed, open( "pkl/aspen_d2_imputemean.p", "wb" ) )
+    pickle.dump( merge_imputed, open( "pkl/aspen_d2_imputemean_alldays.p", "wb" ) )
