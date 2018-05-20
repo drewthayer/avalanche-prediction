@@ -1,16 +1,16 @@
 __Table I. Variables used in the analysis__
 
-| feature | source |feature (lit) | description |
-|----|-----|-----|----|
-| YEAR | _CAIC_ |  YEAR | |
-| MONTH | _CAIC_ | MONTH | |
-| DAY | _CAIC_ |  DAY | |
-| n_avy | _CAIC_ | AVAL 0–1 | Avalanche crosses road |
-| na | na | CLOSE 0–1 | Road closed |
-| snow_h | _SNOTEL: precip_start_m_ | TOTSTK Total stake: total snow | depth in inches|
-| grtr_60_cm | _SNOTEL_ | TOTSTK60 | If TOTSTK>60 cm. TOTSTK60 = TOTSTK60 (cm) |
-| snow_last_24 | _SNOTEL_ | INTSTK | Interval stake: depth of snowfall in last 24 hours |
-| w_4day_snow | _SNOTEL_ | SUMINT | Weighted sum of snow fall in last 4 days: weights = (1.0, 0.75, 0.50, 0.25) |
+| feature | source | imputation |feature (lit) | description |
+|----|-----|-----|----|----|
+| YEAR | _CAIC_ | | YEAR | |
+| MONTH | _CAIC_ | | MONTH | |
+| DAY | _CAIC_ |  | DAY | |
+| n_avy | _CAIC_ | | AVAL 0–1 | Avalanche crosses road |
+| na | na | | CLOSE 0–1 | Road closed |
+| snow_h | _SNOTEL: precip_start_m_ | |TOTSTK Total stake: total snow | depth in inches|
+| GRTR_40 | _SNOTEL_ | 0 (marginal)|TOTSTK60 | If TOTSTK>60 cm. TOTSTK60 = TOTSTK60 (cm) |
+| snow_last_24 | _SNOTEL_ | 0 |  INTSTK | Interval stake: depth of snowfall in last 24 hours |
+| w_4day_snow | _SNOTEL_ | | SUMINT | Weighted sum of snow fall in last 4 days: weights = (1.0, 0.75, 0.50, 0.25) |
 | snow_density | _SNOTEL_ | DENSITY | Density of new snow, ratio of water content of new snow to new snow depth |
 | rel_density | _SNOTEL_ | RELDEN | Relative density of new snow, ratio of density of new snow to density of previous storm |
 | t_max_sum | _SNOTEL_ |SWARM |Sum of maximum temperature on last three ski days, an indicator of a warm spell |
