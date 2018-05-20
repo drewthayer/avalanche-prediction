@@ -10,7 +10,7 @@ def read_and_concat_snotel(directory, station_list):
         snow_df = pd.read_csv(directory + '/' + 'snotel_{}.csv'.format(station),header=58)
         snow_df.columns = cols_raw
         snow_df = clean_snow_data(snow_df)
-        snow_df = remove_airtemp_outliers(snow_df)
+        #snow_df = remove_airtemp_outliers(snow_df)
         # add station name column
         snow_df['station'] = station
         # put station column first
@@ -80,5 +80,5 @@ if __name__=='__main__':
     #avy_df.to_csv(clean_dir + 'avy_data.csv')
 
     # to append:
-    with open(clean_dir + 'airport_data.csv', 'a') as f:
-        airport_df.to_csv(f, header=False)
+    #with open(clean_dir + 'airport_data.csv', 'a') as f:
+    #    airport_df.to_csv(f, header=False)
