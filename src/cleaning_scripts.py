@@ -54,15 +54,6 @@ def clean_snow_data(dataframe):
     # drop datetime string column
     snow_df.drop(['dt_string'], axis=1, inplace=True)
 
-    # remove 2018 data
-    #snow_df.drop(snow_df[snow_df.year == 2018].index, inplace=True)
-
-    # remove rows with swe=0
-    #snow_df.drop(snow_df[snow_df.swe_start_m == 0].index, inplace=True)
-
-    # remove september data (highly volatile and uncharacteristic)
-    #snow_df.drop(snow_df[snow_df.month == 9].index, inplace=True)
-
     #set snow df index to dt
     snow_df.set_index(snow_df.dt, inplace=True)
 
@@ -80,7 +71,7 @@ def clean_airport_data(df,name):
        'DAILYSustainedWindSpeed', 'DAILYSustainedWindDirection']
     airport_df = airport_df[cols]
 
-    # get only daily data
+    # get only data with a DAILYAverageWindSpeed feature
     airport_df = airport_df[~np.isnan(airport_df['DAILYAverageWindSpeed'])]
     airport_df['day'] = airport_df.DATE.str.rsplit(' ',n=1).str[0]
     airport_df['datetime'] = pd.to_datetime(airport_df.day)

@@ -15,12 +15,11 @@ import numpy as np
 from transformation_scripts import oversample
 from plotting_scripts import feat_importance_plot, output_histograms
 
-def run_model(df, cases, n_oversamps, c_true, c_pred, model):
+def run_classifier(df, cases, n_oversamps, c_true, c_pred, model):
     y_true = []
     preds = []
+    probas = []
     n_avy = df.N_AVY
-    # drop related columns
-    df.drop('N_AVY', axis=1, inplace=True)
 
     fig, ax = plt.subplots(1,1,figsize=(6,4))
     for idx, case in enumerate(cases):
@@ -29,8 +28,9 @@ def run_model(df, cases, n_oversamps, c_true, c_pred, model):
         # drop other binary column
         data_df.drop(case[1], axis=1, inplace=True)
         # create target column
-        data_df['Target'] = n_avy * data_df[case[0]]
-        ycol = 'Target'
+        data_df['AVY'] = np.where(df.N_AVY == 0, 1, 0)
+        ycol = 'AVY'
+        data_df.drop('N_AVY', axis=1, inplace=True)
         # drop target binary column
         data_df.drop(case[0], axis=1, inplace=True)
 
@@ -40,11 +40,11 @@ def run_model(df, cases, n_oversamps, c_true, c_pred, model):
         test_df = data_df[data_df.index > splitdate]
 
         # oversample train data
-        n = n_oversamps[idx]
-        train_shuffle, counts, factors = oversample(train_df, 'Target', n=n)
-        print('oversample to n = {}'.format(n))
+        #n = n_oversamps[idx]
+        #train_shuffle, counts, factors = oversample(train_df, 'AVY', n=n)
+        #print('oversample to n = {}'.format(n))
         #pickle.dump( oversamp_df, open( "pkl/aspen_oversamp6.p", "wb" ) )
-        #train_shuffle = train_df
+        train_shuffle = train_df
 
         ''' select features and target X,y '''
         # train set
@@ -59,31 +59,34 @@ def run_model(df, cases, n_oversamps, c_true, c_pred, model):
         ''' run model '''
         model.fit(X_train, y_train)
         # metrics
-        oob = model.oob_score_
-        print('out-of-bag train score = {:0.3f}'.format(oob))
+        #oob = model.oob_score_
+        #print('out-of-bag train score = {:0.3f}'.format(oob))
         importances_rfr = model.feature_importances_
         rfr_feats = sorted(zip(X_train.columns, importances_rfr), key=lambda x:abs(x[1]), reverse=True)
         # predictions
-        preds_rfr = model.predict(X_test)
+        y_hat = model.predict(X_test)
+        proba = model.predict_proba(X_test)
         # save true, predicted for return
-        preds.append(preds_rfr)
+        preds.append(y_hat)
+        probas.append(proba)
         y_true.append(y_test)
 
-        rmse = np.sqrt(np.sum((y_test - preds_rfr)**2)/len(y_test))
-        print('test rmse = {:0.3f}'.format(rmse))
-        #score = accuracy_score(y_test, preds_rfr)
-        #print('rfr test accuracy = {:0.3f}'.format(score))
+
+        #rmse = np.sqrt(np.sum((y_test - preds)**2)/len(y_test))
+        #print('test rmse = {:0.3f}'.format(rmse))
+        score = accuracy_score(y_test, y_hat)
+        print('rfc test accuracy = {:0.3f}'.format(score))
 
         # feature importance plot
         names = X_train.columns
-        filename = '../figs/rfr_d2_2models_{}.png'.format(case[0])
+        filename = '../figs/rfr_d2_2_class{}.png'.format(case[0])
         feat_importance_plot(model,names,filename,color='g',
             alpha=0.5,fig_size=(10,10),dpi=250)
 
         # plot
         h1 = ax.plot(test_datetime,y_test,c_true[idx],
                     label='actual {}'.format(case[0]))
-        h2 = ax.plot(test_datetime,preds_rfr,c_pred[idx],
+        h2 = ax.plot(test_datetime,y_hat,c_pred[idx],
                     linestyle = 'dashed',
                     label='predicted {}'.format(case[0]))
         ax.set_ylabel('daily # of avalanches')
@@ -94,12 +97,12 @@ def run_model(df, cases, n_oversamps, c_true, c_pred, model):
     #plt.savefig('../figs/rfr_d2_slabwet.png', dpi=250)
     #plt.close()
 
-    return y_true, preds
+    return y_true, preds, probas
 
 if __name__=='__main__':
     # load data
     df = pickle.load( open( 'pkl/aspen_d2_imputemean.p', 'rb'))
-    # fill na with zero in case any not imputed 
+    # fill na with zero in case any not imputed
     df.fillna(0, inplace=True)
 
     ''' N_AVY when case = slab/wet '''
@@ -116,11 +119,12 @@ if __name__=='__main__':
         'n_estimators': 500,
         'n_jobs': -1,
         'oob_score':True}
-    rfr = RandomForestRegressor(**best_params)
+    #rfr = RandomForestRegressor(**best_params)
+    rfc = RandomForestClassifier()
 
-    y_true, preds = run_model(df, cases, n_oversamps, c_true, c_pred, model=rfr)
+    y_true, preds, proba = run_classifier(df, cases, n_oversamps, c_true, c_pred, model=rfc)
 
     output_histograms(y_true, preds)
 
     # save outputs to pkl
-    pickle.dump((y_true,preds), open('pkl/aspen_d2_imputemean.p','wb'))
+    pickle.dump((y_true,preds), open('pkl/aspen_d2_class.p','wb'))

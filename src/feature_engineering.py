@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 from scipy.stats import gaussian_kde
+from sklearn.neighbors import NearestNeighbors
 
 from transformation_scripts import water_year_day, water_year_month
 
@@ -98,7 +99,7 @@ def engineer_snotel_df(snotel_df, start_date):
     # amount
     snotel_df['DEPTH'] = snotel_df['precip_start_m']
     # amount > 60 cm
-    snotel_df['GRTR_60'] = np.where(snotel_df.precip_start_m > 0.6, snotel_df.precip_start_m - 0.6, 0)
+    snotel_df['GRTR_40'] = np.where(snotel_df.precip_start_m > 0.4, snotel_df.precip_start_m - 0.4, 0)
     # snow in last 24 hrs
     snotel_df['SNOW_24'] = snotel_df['precip_incr_m']
     # Weighted sum of snow fall in last 4 days: weights = (1.0, 0.75, 0.50, 0.25)
@@ -113,10 +114,10 @@ def engineer_snotel_df(snotel_df, start_date):
     snotel_df['DENSE_24'] = snotel_df['SWE_24'] / snotel_df['SNOW_24'] # need to remove nan, inf
 
     # Change in TOTSTK60 relative to depth of snowfall in the last 24 hours
-    temp = snotel_df['GRTR_60'].values
+    temp = snotel_df['GRTR_40'].values
     temp = np.insert(temp,0,0)
     temp = np.delete(temp, -1)
-    snotel_df['SETTLE'] = (snotel_df['GRTR_60'] - temp) / snotel_df['SNOW_24'] # nans, inf
+    snotel_df['SETTLE'] = (snotel_df['GRTR_40'] - temp) / snotel_df['SNOW_24'] # nans, inf
 
     # min temp last night
     snotel_df['TMIN'] = snotel_df['airtemp_min_C']
@@ -133,7 +134,7 @@ def engineer_snotel_df(snotel_df, start_date):
     # convert station to just number
     snotel_df['STATION'] = snotel_df.station.str.split('_').apply(lambda x: x[0])
     # columns to keep
-    cols = ['datetime', 'DEPTH', 'GRTR_60', 'SNOW_24', 'SNOW_4DAY','SWE_24',
+    cols = ['datetime', 'DEPTH', 'GRTR_40', 'SNOW_24', 'SNOW_4DAY','SWE_24',
             'DENSE_24','SETTLE','TMIN','TMIN_DELTA','TMAX','TMAX_SUM','STATION']
     snow_df = snotel_df[cols]
     # set index to datetime
@@ -143,6 +144,24 @@ def engineer_snotel_df(snotel_df, start_date):
 
     return snow_df
 
+def df_simple_impute(df, method='mean'):
+    # define simple imputer
+    def simple_impute(x, val):
+        if np.isnan(x):
+            return val
+        else:
+            return x
+    # apply to numeric columns
+    for col in df.columns:
+        if df[col].dtype == 'float64':
+            column = df[col]
+            colmean = column.mean()
+            if method == 'mean':
+                val = colmean
+            elif method == 'zero':
+                val = 0
+            df[col] = column.apply(lambda x: simple_impute(x, val))
+    return df
 
 
 if __name__=='__main__':
@@ -154,8 +173,14 @@ if __name__=='__main__':
     airport_df = pd.read_csv(clean_dir + 'airport_data.csv')
     snotel_df = pd.read_csv(clean_dir + 'snotel_data.csv')
 
+    # impute here
+    # for column:
+    avy_imputed = df_simple_impute(avy_df, method='mean')
+    airport_imputed = df_simple_impute(airport_df, method='mean')
+    snotel_imputed = df_simple_impute(snotel_df, method='mean')
+
     # engineer CAIC data
-    zone_df = engineer_avy_df(avy_df, 'Aspen', min_dsize=2)
+    zone_df = engineer_avy_df(avy_imputed, 'Aspen', min_dsize=2)
 
     # time range:
     start_date = zone_df.index.min()
@@ -163,10 +188,11 @@ if __name__=='__main__':
 
     # engineer wind data
     airport_list = ['aspen', 'leadville']
-    wind_df = engineer_wind_df(airport_df, airport_list)
+    wind_df = engineer_wind_df(airport_imputed, airport_list)
 
     # engineer snotel data
-    snow_df = engineer_snotel_df(snotel_df, start_date)
+    snow_df = engineer_snotel_df(snotel_imputed, start_date)
+    snow_df = df_simple_impute(snow_df, method='zero') # impute zero for engineered features
     pickle.dump( snow_df, open( "pkl/snow_df.p", "wb" ) )
 
 
@@ -195,20 +221,8 @@ if __name__=='__main__':
     # remove non-numeric columns
     merge_all.drop('STATION', axis=1, inplace=True)
 
-    # test for nans
-    test_nans = np.sum(merge_all.isna())
+    merge_imputed = df_simple_impute(merge_all, method='mean')
+
 
     ''' save to pickle '''
-    pickle.dump( merge_all, open( "pkl/aspen_d2_slabwet_labeled.p", "wb" ) )
-
-    # diagnostics
-    fig, ax = plt.subplots(1,2, figsize=(8,4))
-    ax[0].plot(merge_all.P_SLAB, merge_all.SLAB, 'ok')
-    ax[0].set_title('slab avalanche')
-    ax[0].set_xlabel('p(slab)')
-    ax[0].set_ylabel('events')
-    ax[1].plot(merge_all.P_WET, merge_all.WET, 'ok')
-    ax[1].set_title('wet avalanche')
-    ax[1].set_xlabel('p(wet)')
-    plt.tight_layout()
-    plt.show()
+    pickle.dump( merge_imputed, open( "pkl/aspen_d2_imputemean.p", "wb" ) )

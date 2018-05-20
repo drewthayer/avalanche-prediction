@@ -29,12 +29,14 @@ if __name__=='__main__':
 
     fig, ax = plt.subplots(1,2,figsize=(10,5))
     ax[0].hist(xt, bins=20, normed=True)
-    ax[0].plot(xx, dist_t.pdf(xx), '-k', label='beta({}, {})'.format(a[0],b[0]))
+    ax[0].plot(xx, dist_t.pdf(xx), '-k',
+            label=r'beta($\alpha$ = {}, $\beta$ = {})'.format(a[0],b[0]))
     ax[0].set_title('true')
     ax[0].legend()
 
     ax[1].hist(xp, bins=20, normed=True)
-    ax[1].plot(xx, dist_p.pdf(xx), '-k', label='beta({}, {})'.format(a[1],b[1]))
+    ax[1].plot(xx, dist_p.pdf(xx), '-k',
+            label=r'beta($\alpha$ = {}, $\beta$ = {})'.format(a[1],b[1]))
     ax[1].set_title('predicted')
     ax[1].legend()
 
