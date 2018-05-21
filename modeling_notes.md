@@ -281,13 +281,28 @@ test accuracy = 0.946
 test recall = 0.932
 {'criterion': 'gini', 'max_features': 'log2', 'min_samples_leaf': 10, 'min_samples_split': 8, 'n_estimators': 500, 'n_jobs': -1, 'oob_score': True, 'verbose': 1}
 
-case: WET (pretty bad recall )
+case: WET (bad recall)
 test accuracy = 0.935
 test recall = 0.125
-{'criterion': 'gini', 'max_features': 'log2', 'min_samples_leaf': 5, 'min_samples_split': 6, 'n_estimators': 500, 'n_jobs': -1, 'oob_score': True, 'verbose': 1}
+{'criterion': 'gini', 'max_features': 'log2', 'min_samples_leaf': 7, 'min_samples_split': 9, 'n_estimators': 700, 'n_jobs': -1, 'oob_score': True, 'verbose': 1}
 
 
 #### grid search on GBC: good accuracy, not as good recall. note high subsample ratio
-test accuracy = 0.942
+case: SLAB
+test accuracy = 0.935
 test recall = 0.892
-{'criterion': 'friedman_mse', 'learning_rate': 0.01, 'loss': 'deviance', 'max_features': 'log2', 'min_samples_leaf': 6, 'min_samples_split': 5, 'n_estimators': 300, 'subsample': 0.5, 'verbose': 2}
+{'criterion': 'friedman_mse', 'learning_rate': 0.01, 'loss': 'exponential', 'max_features': 'log2', 'min_samples_leaf': 4, 'min_samples_split': 6, 'n_estimators': 400, 'subsample': 0.8, 'verbose': 1}
+
+
+
+### results:
+__RFC__
+case: SLAB
+test accuracy_score = 0.946
+test recall_score = 0.932
+test precision_score = 0.873
+
+case: WET
+test accuracy_score = 0.935
+test recall_score = 0.125
+test precision_score = 0.333
