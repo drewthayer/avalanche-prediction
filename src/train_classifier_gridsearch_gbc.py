@@ -5,10 +5,17 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import recall_score
+from sklearn.metrics import precision_score
 import pandas as pd
 import pickle
 #import matplotlib.pyplot as plt
 import numpy as np
+
+def print_scores(y_true, y_hat, method_list):
+    methods = [accuracy_score, recall_score, precision_score]
+    for method in methods:
+        score = method(y_test, y_hat)
+        print('test {} = {:0.3f}'.format(method.__name__, score))
 
 
 if __name__=='__main__':
@@ -17,16 +24,14 @@ if __name__=='__main__':
     # fill na with zero in case any not imputed
     df.fillna(0, inplace=True)
 
-    ''' N_AVY when case = slab/wet '''
+    ''' case : slab or wet '''
     cases = [['SLAB','WET'], ['WET','SLAB']]
-    c_true = ['b','g']
-    c_pred = ['r','orange']
-    n_oversamps = [1,1]
 
-    ''' case 1: slab avalanche  '''
-    case = cases[0]
+    ''' run case   '''
+    case = cases[0] # chose case here, 0 or 1
     data_df = df.copy() # copy to read all columns after dropping
-    print('case: {}'.format(case[0]))
+
+    df.drop('N_AVY', axis=1, inplace=True)
 
     # drop other binary and probability column
     c_drop = [c for c in list(df.columns) if case[1] in c]
@@ -58,14 +63,14 @@ if __name__=='__main__':
 
     param_grid = {
         'loss':['deviance','exponential'],
-        'learning_rate':[0.01,0.1]
+        'learning_rate':[0.01,0.05,0.1],
         'n_estimators': [300,400,500,600],
         'criterion': ['friedman_mse'],
         'max_features': ['log2'],
-        'min_samples_split': [3, 4, 5, 6, 7],
-        'min_samples_leaf': [2, 3, 4, 5, 6],
-        'subsample': [0.5,0.75,1]
-        'verbose': [2]
+        'min_samples_split': [4, 5, 6, 7],
+        'min_samples_leaf': [3, 4, 5, 6],
+        'subsample': [0.4, 0.5, 0.6, 0.7, 0.8],
+        'verbose': [1]
         }
 
     est = GradientBoostingClassifier()
@@ -74,6 +79,8 @@ if __name__=='__main__':
     grid.fit(X_train, y_train)
 
     y_hat = grid.predict(X_test)
+
+    print('case: {}'.format(case[0]))
 
     score_a = accuracy_score(y_test, y_hat)
     print('test accuracy = {:0.3f}'.format(score_a))
@@ -85,4 +92,4 @@ if __name__=='__main__':
 
     best_est = grid.best_estimator_
 
-    pickle.dump(best_est, open("best_est_gbc.p", "wb"))
+    pickle.dump(best_est, open("best-ests/best_est_gbc_slab.p", "wb"))
