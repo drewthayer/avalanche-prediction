@@ -56,9 +56,9 @@ if __name__=='__main__':
     # train model
 
     param_grid = {
-        'n_estimators': [300, 400, 500, 600],
-        'criterion': ['gini','entropy'],
-        'max_features': ['auto','sqrt','log2'],
+        'n_estimators': [500],
+        'criterion': ['gini'],
+        'max_features': ['log2'],
         'min_samples_split': [3, 4, 5, 6, 7],
         'min_samples_leaf': [2, 3, 4, 5, 6],
         'oob_score': [True],
