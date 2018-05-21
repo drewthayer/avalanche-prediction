@@ -9,8 +9,6 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 
-from plotting_scripts import feat_importance_plot
-
 def predict_classifier(X_test, y_test, model):
     ''' applies .predict() method of fitted classifier to X,y data '''
     y_hat = model.predict(X_test)
@@ -54,16 +52,14 @@ def multi_case_classifier_predict(df, cases, ests,
         # datetime for plot
         test_datetime = pd.to_datetime(X_test.index)
 
-
         ''' predict with fitted model  '''
         y_hat, y_proba, importances = predict_classifier(X_test, y_test, est)
-        feats = sorted(zip(X_train.columns, importances), key=lambda x:abs(x[1]), reverse=True)
 
         # save true, predicted, proba, feats
         y_true_l.append(y_test)
         y_hat_l.append(y_hat)
         y_proba_l.append(y_proba)
-        feats_l.append(feats)
+        feats_l.append((X_train.columns,importances))
 
         # print scores
         method_list = [accuracy_score, recall_score, precision_score]
@@ -100,8 +96,8 @@ if __name__=='__main__':
     df.fillna(0, inplace=True)
 
     #load fitted models
-    est_slab = pickle.load( open( 'best-ests/best_est_rfc_slab.p', 'rb'))
-    est_wet = pickle.load( open( 'best-ests/best_est_rfc_wet.p', 'rb'))
+    est_slab = pickle.load( open( 'best-ests/best_est_gbc_slab.p', 'rb'))
+    est_wet = pickle.load( open( 'best-ests/best_est_gbc_wet.p', 'rb'))
 
     ''' N_AVY when case = slab/wet '''
     params = {
@@ -115,4 +111,6 @@ if __name__=='__main__':
 
     # save outputs to pkl
     pickle.dump((y_true_l, y_hat_l, y_proba_l, feats_l, test_ts),
-            open('pkl/aspen_d2_rfc_best_output.p','wb'))
+            open('pkl/aspen_d2_gbc_best_output.p','wb'))
+
+    # save output dataframe to pkl
