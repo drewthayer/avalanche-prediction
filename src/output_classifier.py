@@ -5,17 +5,7 @@ import numpy as np
 import scipy.stats as stats
 from ROC import ROC
 
-def output_histograms_classification(prob1, prob2, prob3, labels):
-    fig, ax = plt.subplots(1,3,figsize=(10,5))
-    ax[0].hist(prob1, 20, color='b', label=labels[0])
-    ax[0].legend()
-    ax[1].hist(prob2, 20, color='g', label=labels[1])
-    ax[1].legend()
-    ax[2].hist(prob3, 20, color='teal', label=labels[2])
-    ax[2].legend()
-    plt.show()
-
-from plotting_scripts import feat_importance_plot, output_histograms
+from plotting_scripts import feat_importance_plot, output_histograms_classification
 
 if __name__=='__main__':
     # load data
@@ -63,34 +53,3 @@ if __name__=='__main__':
 
         # apr plot
         roc.a_r_p_plot(y_true, y_proba)
-
-
-
-
-
-    # # define x, xx
-    # xt = true_slab
-    # xp = pred_slab
-    #
-    # xx = np.linspace(min(true_slab), max(true_slab), 300)
-    #
-    # ''' plot beta distributions and histograms '''
-    # a = [1.3, 1.6]
-    # b = [7, 8]
-    # dist_t = stats.beta(a[0], b[0], loc=0, scale=8)
-    # dist_p = stats.beta(a[1] ,b[1], loc=0, scale=7)
-    #
-    # fig, ax = plt.subplots(1,2,figsize=(10,5))
-    # ax[0].hist(xt, bins=20, normed=True)
-    # ax[0].plot(xx, dist_t.pdf(xx), '-k',
-    #         label=r'beta($\alpha$ = {}, $\beta$ = {})'.format(a[0],b[0]))
-    # ax[0].set_title('true')
-    # ax[0].legend()
-    #
-    # ax[1].hist(xp, bins=20, normed=True)
-    # ax[1].plot(xx, dist_p.pdf(xx), '-k',
-    #         label=r'beta($\alpha$ = {}, $\beta$ = {})'.format(a[1],b[1]))
-    # ax[1].set_title('predicted')
-    # ax[1].legend()
-    #
-    # plt.show()
