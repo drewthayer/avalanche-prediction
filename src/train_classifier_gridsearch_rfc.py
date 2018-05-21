@@ -49,11 +49,11 @@ if __name__=='__main__':
 
     # train model
     param_grid = {
-        'n_estimators': [300, 500, 600],
+        'n_estimators': [500, 600, 700],
         'criterion': ['gini'],
         'max_features': ['log2'],
-        'min_samples_split': [6, 7, 8, 9, 10],
-        'min_samples_leaf': [5, 6, 7, 8, 9],
+        'min_samples_split': [8, 9, 10, 11, 12],
+        'min_samples_leaf': [7, 8, 9, 10, 11],
         'oob_score': [True],
         'n_jobs': [-1],
         'verbose': [1]
@@ -78,4 +78,4 @@ if __name__=='__main__':
 
     best_est = grid.best_estimator_
 
-    pickle.dump(best_est, open("best-ests/best_est_rfc_wet.p", "wb"))
+    pickle.dump(best_est, open("best-ests/best_est_rfc_slab.p", "wb"))
