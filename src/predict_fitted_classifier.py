@@ -9,6 +9,8 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 
+from plotting_scripts import feat_importance_plot
+
 def predict_classifier(X_test, y_test, model):
     ''' applies .predict() method of fitted classifier to X,y data '''
     y_hat = model.predict(X_test)
@@ -17,9 +19,8 @@ def predict_classifier(X_test, y_test, model):
     return y_hat, y_proba, importances
 
 def print_scores(y_true, y_hat, method_list):
-    methods = [accuracy_score, recall_score, precision_score]
-    for method in methods:
-        score = method(y_test, y_hat)
+    for method in method_list:
+        score = method(y_true, y_hat)
         print('test {} = {:0.3f}'.format(method.__name__, score))
 
 def multi_case_classifier_predict(df, cases, ests,
@@ -53,27 +54,26 @@ def multi_case_classifier_predict(df, cases, ests,
         # datetime for plot
         test_datetime = pd.to_datetime(X_test.index)
 
-        ''' debug '''
-        print(X_test.columns)
 
         ''' predict with fitted model  '''
         y_hat, y_proba, importances = predict_classifier(X_test, y_test, est)
-        feats = sorted(zip(X_train.columns, importances_rfr), key=lambda x:abs(x[1]), reverse=True)
+        feats = sorted(zip(X_train.columns, importances), key=lambda x:abs(x[1]), reverse=True)
 
         # save true, predicted, proba, feats
         y_true_l.append(y_test)
         y_hat_l.append(y_hat)
-        y_proba_l.append(proba)
+        y_proba_l.append(y_proba)
         feats_l.append(feats)
 
         # print scores
+        method_list = [accuracy_score, recall_score, precision_score]
         print_scores(y_test, y_hat, method_list)
 
         # feature importance plot
-        names = X_train.columns
-        filename = '../figs/rfr_d2_2_class{}.png'.format(case[0])
-        feat_importance_plot(model,names,filename,color='g',
-            alpha=0.5,fig_size=(10,10),dpi=250)
+        # names = X_train.columns
+        # filename = '../figs/rfr_d2_2_class{}.png'.format(case[0])
+        # feat_importance_plot(model,names,filename,color='g',
+        #     alpha=0.5,fig_size=(10,10),dpi=250)
 
         # plot
         h1 = ax.plot(test_datetime,y_test,c_t,
@@ -114,5 +114,5 @@ if __name__=='__main__':
     y_true_l, y_hat_l, y_proba_l, feats_l, test_ts = multi_case_classifier_predict(df, **params)
 
     # save outputs to pkl
-    pickle.dump((y_true_l, y_hat_l, y_proba_l, feats_l, test_datetime),
+    pickle.dump((y_true_l, y_hat_l, y_proba_l, feats_l, test_ts),
             open('pkl/aspen_d2_rfc_best_output.p','wb'))

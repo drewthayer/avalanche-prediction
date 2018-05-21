@@ -10,7 +10,7 @@ from plotting_scripts import feat_importance_plot, output_histograms_classificat
 if __name__=='__main__':
     # load data
     y_true_l, y_hat_l, y_proba_l, feat_list, test_timestamps = pickle.load(
-            open( 'pkl/aspen_d2_class_all_output.p', 'rb'))
+            open( 'pkl/aspen_d2_rfc_best_output.p', 'rb'))
 
     # probabilities
     slab_proba = y_proba_l[0][:,1]

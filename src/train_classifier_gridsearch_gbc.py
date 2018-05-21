@@ -29,7 +29,7 @@ if __name__=='__main__':
     cases = [['SLAB','WET'], ['WET','SLAB']]
 
     ''' run case   '''
-    case = cases[0] # chose case here, 0 or 1
+    case = cases[1] # chose case here, 0 or 1
     data_df = df.copy() # copy to read all columns after dropping
 
     # drop other binary and probability column
@@ -91,4 +91,4 @@ if __name__=='__main__':
 
     best_est = grid.best_estimator_
 
-    pickle.dump(best_est, open("best-ests/best_est_gbc_slab.p", "wb"))
+    pickle.dump(best_est, open("best-ests/best_est_gbc_{}.p".format(case[0]), "wb"))
