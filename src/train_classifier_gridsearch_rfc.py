@@ -13,6 +13,7 @@ import numpy as np
 if __name__=='__main__':
     # load data
     df = pickle.load( open( 'pkl/aspen_d2_imputemean_alldays.p', 'rb'))
+    df.drop('N_AVY', axis=1, inplace=True)
     # fill na with zero in case any not imputed
     df.fillna(0, inplace=True)
 
@@ -20,10 +21,8 @@ if __name__=='__main__':
     cases = [['SLAB','WET'], ['WET','SLAB']]
 
     ''' run case   '''
-    case = cases[1] # chose case here, 0 or 1
+    case = cases[0] # chose case here, 0 or 1
     data_df = df.copy() # copy to read all columns after dropping
-
-    df.drop('N_AVY', axis=1, inplace=True)
 
     # drop other binary and probability column
     c_drop = [c for c in list(df.columns) if case[1] in c]
