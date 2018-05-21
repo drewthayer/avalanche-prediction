@@ -20,9 +20,8 @@ if __name__=='__main__':
     cases = [['SLAB','WET'], ['WET','SLAB']]
 
     ''' run case   '''
-    case = cases[0]
+    case = cases[1] # chose case here, 0 or 1
     data_df = df.copy() # copy to read all columns after dropping
-    print('case: {}'.format(case[0]))
 
     df.drop('N_AVY', axis=1, inplace=True)
 
@@ -54,8 +53,8 @@ if __name__=='__main__':
         'n_estimators': [300, 500, 600],
         'criterion': ['gini'],
         'max_features': ['log2'],
-        'min_samples_split': [ 5, 6, 7, 8, 9],
-        'min_samples_leaf': [ 4, 5, 6, 7, 8],
+        'min_samples_split': [6, 7, 8, 9, 10],
+        'min_samples_leaf': [5, 6, 7, 8, 9],
         'oob_score': [True],
         'n_jobs': [-1],
         'verbose': [1]
@@ -67,6 +66,8 @@ if __name__=='__main__':
     grid.fit(X_train, y_train)
 
     y_hat = grid.predict(X_test)
+
+    print('case: {}'.format(case[0]))
 
     score_a = accuracy_score(y_test, y_hat)
     print('test accuracy = {:0.3f}'.format(score_a))
