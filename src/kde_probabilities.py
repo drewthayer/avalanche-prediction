@@ -32,8 +32,6 @@ if __name__=='__main__':
     smooth = 0.35
     probs_list = kde_probabilities(avy_df, feature_vals, feature_col, target_col, days, smooth)
 
-    #totmax = max(max(probs_list[0]), max(probs_list[1]))
-
     # plot
     fig, ax = plt.subplots()
     plt.fill(probs_list[0], 'b', label='slab', alpha=0.5)

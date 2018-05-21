@@ -274,3 +274,9 @@ Out[52]: 1.0
 
 In [53]: roc.recall
 Out[53]: 0.071428571428571425
+
+#### grid search on rfr classifier
+case: SLAB
+test accuracy = 0.938
+test recall = 0.905
+{'criterion': 'gini', 'max_features': 'log2', 'min_samples_leaf': 3, 'min_samples_split': 5, 'n_estimators': 500, 'n_jobs': -1, 'oob_score': True}

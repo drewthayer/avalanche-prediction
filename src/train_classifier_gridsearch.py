@@ -59,10 +59,11 @@ if __name__=='__main__':
         'n_estimators': [300, 400, 500, 600],
         'criterion': ['gini','entropy'],
         'max_features': ['auto','sqrt','log2'],
-        'min_samples_split': [2, 3, 4, 5],
-        'min_samples_leaf': [1, 2, 3],
+        'min_samples_split': [3, 4, 5, 6, 7],
+        'min_samples_leaf': [2, 3, 4, 5, 6],
         'oob_score': [True],
-        'n_jobs': [-1]
+        'n_jobs': [-1],
+        'verbose': [2]
         }
 
     est = RandomForestClassifier()
