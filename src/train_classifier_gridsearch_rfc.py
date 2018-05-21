@@ -16,16 +16,15 @@ if __name__=='__main__':
     # fill na with zero in case any not imputed
     df.fillna(0, inplace=True)
 
-    ''' N_AVY when case = slab/wet '''
+    ''' case : slab or wet '''
     cases = [['SLAB','WET'], ['WET','SLAB']]
-    c_true = ['b','g']
-    c_pred = ['r','orange']
-    n_oversamps = [1,1]
 
-    ''' case 1: slab avalanche  '''
-    case = cases[1]
+    ''' run case   '''
+    case = cases[0]
     data_df = df.copy() # copy to read all columns after dropping
     print('case: {}'.format(case[0]))
+
+    df.drop('N_AVY', axis=1, inplace=True)
 
     # drop other binary and probability column
     c_drop = [c for c in list(df.columns) if case[1] in c]
@@ -37,9 +36,6 @@ if __name__=='__main__':
     test_df = data_df[data_df.index > splitdate]
 
     # oversample train data
-    #train_shuffle, counts, factors = oversample(train_df, 'AVY', n=n)
-    #print('oversample to n = {}'.format(n))
-    #pickle.dump( oversamp_df, open( "pkl/aspen_oversamp6.p", "wb" ) )
     train_shuffle = train_df
 
     ''' select features and target X,y '''
@@ -54,7 +50,6 @@ if __name__=='__main__':
 
 
     # train model
-
     param_grid = {
         'n_estimators': [300, 500, 600],
         'criterion': ['gini'],
@@ -83,4 +78,4 @@ if __name__=='__main__':
 
     best_est = grid.best_estimator_
 
-    pickle.dump(best_est, open("best_est_rfc_wet.p", "wb"))
+    pickle.dump(best_est, open("best_est_rfc_slab.p", "wb"))
