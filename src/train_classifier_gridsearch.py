@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import recall_score
 import pandas as pd
 import pickle
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -23,7 +23,7 @@ if __name__=='__main__':
     n_oversamps = [1,1]
 
     ''' case 1: slab avalanche  '''
-    case = cases[0]
+    case = cases[1]
     data_df = df.copy() # copy to read all columns after dropping
     print('case: {}'.format(case[0]))
 
@@ -56,19 +56,19 @@ if __name__=='__main__':
     # train model
 
     param_grid = {
-        'n_estimators': [500],
+        'n_estimators': [300, 500, 600],
         'criterion': ['gini'],
         'max_features': ['log2'],
-        'min_samples_split': [3, 4, 5, 6, 7],
-        'min_samples_leaf': [2, 3, 4, 5, 6],
+        'min_samples_split': [ 5, 6, 7, 8, 9],
+        'min_samples_leaf': [ 4, 5, 6, 7, 8],
         'oob_score': [True],
         'n_jobs': [-1],
-        'verbose': [2]
+        'verbose': [1]
         }
 
     est = RandomForestClassifier()
 
-    grid = GridSearchCV(est, param_grid)
+    grid = GridSearchCV(est, param_grid, scoring='recall')
     grid.fit(X_train, y_train)
 
     y_hat = grid.predict(X_test)
@@ -83,4 +83,4 @@ if __name__=='__main__':
 
     best_est = grid.best_estimator_
 
-    pickle.dump(best_est, open("best_est.p", "wb"))
+    pickle.dump(best_est, open("best_est_rfc_wet.p", "wb"))
