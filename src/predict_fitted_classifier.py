@@ -28,7 +28,6 @@ def multi_case_classifier_predict(df, cases, ests,
     y_hat_l = []
     y_proba_l = []
     feats_l = []
-    df.drop('N_AVY', axis=1, inplace=True)
 
     fig, ax = plt.subplots(1,1,figsize=(6,4))
     for case, est, n, c_t, c_p in zip(cases, ests, n_oversamps, c_true, c_pred):
@@ -96,6 +95,7 @@ def multi_case_classifier_predict(df, cases, ests,
 if __name__=='__main__':
     # load data
     df = pickle.load( open( 'pkl/aspen_d2_imputemean_alldays.p', 'rb'))
+    df.drop('N_AVY', axis=1, inplace=True)
     # fill na with zero in case any not imputed
     df.fillna(0, inplace=True)
 

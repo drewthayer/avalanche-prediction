@@ -277,10 +277,9 @@ Out[53]: 0.071428571428571425
 
 #### grid search on rfr classifier
 case: SLAB
-
-test accuracy = 0.938
-test recall = 0.919
-{'criterion': 'gini', 'max_features': 'log2', 'min_samples_leaf': 6, 'min_samples_split': 8, 'n_estimators': 300, 'n_jobs': -1, 'oob_score': True, 'verbose': 1}
+test accuracy = 0.946
+test recall = 0.932
+{'criterion': 'gini', 'max_features': 'log2', 'min_samples_leaf': 10, 'min_samples_split': 8, 'n_estimators': 500, 'n_jobs': -1, 'oob_score': True, 'verbose': 1}
 
 case: WET (pretty bad recall )
 test accuracy = 0.935
