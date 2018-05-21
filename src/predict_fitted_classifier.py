@@ -54,6 +54,9 @@ def multi_case_classifier_predict(df, cases, ests,
         # datetime for plot
         test_datetime = pd.to_datetime(X_test.index)
 
+        ''' debug '''
+        print(X_test.columns)
+
         ''' predict with fitted model  '''
         y_hat, y_proba, importances = predict_classifier(X_test, y_test, est)
         feats = sorted(zip(X_train.columns, importances_rfr), key=lambda x:abs(x[1]), reverse=True)
