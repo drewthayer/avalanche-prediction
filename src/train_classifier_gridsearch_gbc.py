@@ -61,14 +61,14 @@ if __name__=='__main__':
     # train model
 
     param_grid = {
-        'loss':['deviance','exponential'],
-        'learning_rate':[0.01,0.05,0.1],
-        'n_estimators': [300,400,500,600],
+        'loss':['deviance'],
+        'learning_rate':[0.025,0.05,0.075],
+        'n_estimators': [500, 600, 700],
         'criterion': ['friedman_mse'],
         'max_features': ['log2'],
-        'min_samples_split': [4, 5, 6, 7],
-        'min_samples_leaf': [3, 4, 5, 6],
-        'subsample': [0.4, 0.5, 0.6, 0.7, 0.8],
+        'min_samples_split': [4, 5, 6],
+        'min_samples_leaf': [4, 5, 6],
+        'subsample': [0.2, 0.3, 0.4, 0.5, 0.6],
         'verbose': [1]
         }
 
