@@ -72,3 +72,37 @@ __Data:__
  - _train and test split:_ June 2016
 
 <img alt='timeseries' src='figs/eda/aspen_avys_d2plus.png' width='500'>
+
+### current state:
+__best model: random forest classifier__
+ - test accuracy = 0.942
+ - test recall = 0.932
+
+### feature engineering
+ - use features that control the physical processes that create avalanche conditions:
+   - snowfall, wind, temperature
+ - literature: features used in avalanche modeling study in Little Cottonwood Canyon, UT
+   - _Blatternberger and Fowles, 2016. Treed Avalanche Forecasting: Mitigating Avalanche Danger Utilizing Bayesian Additive Regression Trees. Journal of Forecasting, J. Forecast. 36, 165–180 (2017). DOI: 10.1002/for.2421_
+
+ __probabilities of slab/ wet avalanches:__
+  - slab and wet avalanches have overlapping, yet different seasons:
+<img alt='timeseries' src='figs/eda/types_by_month_slab_WL.png' width='500'>
+
+  - relative probability modeled as Gaussian KDE function:
+<img alt='timeseries' src='figs/eda/types_by_day_nonorm.png' width='500'>
+
+  - each day, calculate p(slab) and p(wet) as function of day-of-water-year
+
+### modeling:
+__training:__
+ - training data: Aspen Zone, period of record from 2010-2016, CAIC records for D rating > 2 avalanches
+ - target: binary label for occurence of any avalanches with D rating > 2
+ - separate targets for slab and wet occurence
+ - separate models for slab and wet avalanches
+   - each model does not include # or probability of other type of avalanche
+
+__testing:__
+- test data: 2016 - 2018 period of record
+- predict probability of positive class with each model (slab/wet avalanche occured)
+- add probabilities: $\Sigma p_{slab}, p_{wet} = p_{avalanche}$
+- evaluate model accuracy and recall  
