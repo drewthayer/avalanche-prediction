@@ -26,7 +26,7 @@ class ROC():
         self.FP = np.sum(np.subtract(y_true, y_hat)==-1)
         self.FN = np.sum(np.subtract(y_true, y_hat)==1)
         self.TPR = self.TP / (self.TP + self.FN)
-        self.FPR = self.FN / (self.TP + self.FN)
+        self.FPR = self.FP / (self.FP + self.TN)
         self.accuracy = (self.TP + self.TN) / (self.TP + self.TN + self.FP + self.FN)
         self.recall = self.TPR
         self.precision = self.TP/(self.TP + self.FP)
@@ -75,7 +75,7 @@ class ROC():
         FP_rates = []
         TP_rates = []
         #make thresholds
-        thresholds = y_proba
+        thresholds = np.linspace(0,1,200)
         thresholds.sort()
         thresholds = np.flip(thresholds, axis=0)
         thresholds = np.insert(thresholds,0,1)
@@ -91,20 +91,19 @@ class ROC():
         accs = []
         prec = []
         recs = []
-
-        thresholds = y_proba
-        thresholds.sort()
-        thresholds = np.flip(thresholds, axis=0)
-        thresholds = np.insert(thresholds,0,1)
+        thresholds = np.linspace(0,1,200)
+        #thresholds.sort()
+        #thresholds = np.flip(thresholds, axis=0)
+        #thresholds = np.insert(thresholds,0,1)
         for t in thresholds:
             y_temp = np.where(y_proba > t, 1, 0)
             tp, tn, fp, fn = self.standard_confusion_matrix(y_true, y_temp)
             accs.append((tp+fp)/(tp+tn+fp+fn))
             prec.append(tp/(tp+fp))
             recs.append(tp/(tp+fn))
-        plt.plot(thresholds, accs, 'b--', label='acc')
-        plt.plot(thresholds, prec, 'k--', label='prec')
         plt.plot(thresholds, recs, 'g--', label='recall')
+        plt.plot(thresholds, accs, 'b--', label='accuracy')
+        plt.plot(thresholds, prec, 'k--', label='precision')
         plt.xlabel('probability threshold')
         plt.legend()
         plt.show()
