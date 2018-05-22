@@ -174,7 +174,6 @@ if __name__=='__main__':
     snotel_df = pd.read_csv(clean_dir + 'snotel_data.csv')
 
     # impute here
-    # for column:
     avy_imputed = df_simple_impute(avy_df, method='mean')
     airport_imputed = df_simple_impute(airport_df, method='mean')
     snotel_imputed = df_simple_impute(snotel_df, method='mean')
