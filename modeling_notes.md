@@ -1,5 +1,10 @@
 ### modeling notes
 
+data time ranges:
+aspen airport data: 2006-01-01 to 2018-04-16
+caic avy data: 2010-11-15 to 2018-04-10
+snotel data: 1980-10-16 to 2017-12-31
+
 5/14/18 ran with first iteration of features from LCC paper
  - major increase in performance!
  - figs/prelim_imbalanced
@@ -445,3 +450,15 @@ combined
 acc: 0.920
 prec: 0.860
 rec: 0.880
+
+### try it on NSJ (potential problem lots of months with zero)
+__GBC__
+case: SLAB
+test accuracy_score = 0.956
+test recall_score = 0.990
+test precision_score = 0.776
+
+case: WET
+test accuracy_score = 0.952
+test recall_score = 0.654
+test precision_score = 0.436

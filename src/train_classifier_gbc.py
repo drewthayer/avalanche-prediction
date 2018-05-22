@@ -58,7 +58,7 @@ def print_scores(y_true, y_hat, method_list):
 
 if __name__=='__main__':
     # load data
-    df = pickle.load( open( 'pkl/aspen_d2_imputemean_alldays.p', 'rb'))
+    df = pickle.load( open( 'pkl/nsanjuan_data.p', 'rb'))
     df.drop('N_AVY', axis=1, inplace=True)
     #df.drop('MONTH', axis=1, inplace=True)
     # fill na with zero in case any not imputed
@@ -113,4 +113,4 @@ if __name__=='__main__':
     print('case: {}'.format(case[0]))
     print_scores(y_test, y_hat, method_list)
 
-    pickle.dump((est, stndzr), open("best-ests/best_est_gbc_{}_scaled.p".format(case[0]), "wb"))
+    pickle.dump((est, stndzr), open("best-ests/nsj_best_est_gbc_{}_scaled.p".format(case[0]), "wb"))

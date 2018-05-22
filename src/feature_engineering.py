@@ -170,8 +170,8 @@ if __name__=='__main__':
     clean_dir = ''.join([current,'/../data/data-clean/'])
     # load data
     avy_df = pd.read_csv(clean_dir + 'avy_data.csv')
-    airport_df = pd.read_csv(clean_dir + 'airport_data.csv')
-    snotel_df = pd.read_csv(clean_dir + 'snotel_data.csv')
+    airport_df = pd.read_csv(clean_dir + 'airport_data_NSanJuan.csv')
+    snotel_df = pd.read_csv(clean_dir + 'snotel_data_NSanJuan.csv')
 
     # impute here
     avy_imputed = df_simple_impute(avy_df, method='mean')
@@ -179,14 +179,14 @@ if __name__=='__main__':
     snotel_imputed = df_simple_impute(snotel_df, method='mean')
 
     # engineer CAIC data
-    zone_df = engineer_avy_df(avy_imputed, 'Aspen', min_dsize=2)
+    zone_df = engineer_avy_df(avy_imputed, 'Northern San Juan', min_dsize=2)
 
     # time range:
     start_date = zone_df.index.min()
     end_date = zone_df.index.max()
 
     # engineer wind data
-    airport_list = ['aspen', 'leadville']
+    airport_list = ['montrose']
     wind_df = engineer_wind_df(airport_imputed, airport_list)
 
     # engineer snotel data
@@ -211,7 +211,7 @@ if __name__=='__main__':
                     '547_ivanhoe']
 
     # to test, use only one station
-    snow_df = snow_df[snow_df.STATION == '542']
+    snow_df = snow_df[snow_df.STATION == '713']
 
     ''' assemble feature matrix '''
     merge = pd.merge(snow_df, wind_df, how='left', left_index=True, right_index=True)
@@ -224,4 +224,4 @@ if __name__=='__main__':
 
 
     ''' save to pickle '''
-    pickle.dump( merge_imputed, open( "pkl/aspen_d2_imputemean_alldays.p", "wb" ) )
+    pickle.dump( merge_imputed, open( "pkl/nsanjuan_data.p", "wb" ) )

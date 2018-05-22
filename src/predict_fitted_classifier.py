@@ -8,6 +8,7 @@ import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
+import pdb
 
 def train_test_split_time(df, splitdate_str, y_col):
     splitdate = pd.to_datetime(splitdate_str)
@@ -25,6 +26,7 @@ def train_test_split_time(df, splitdate_str, y_col):
 
 def predict_classifier(X_test, y_test, est, standardizer):
     ''' applies .predict() method of fitted classifier to X,y data '''
+    pdb.set_trace()
     X_scaled = standardizer.transform(X_test)
     y_hat = est.predict(X_scaled)
     y_proba = est.predict_proba(X_scaled)
@@ -100,8 +102,8 @@ if __name__=='__main__':
     df.fillna(0, inplace=True)
 
     #load fitted models
-    est_slab, std_slab = pickle.load( open( 'best-ests/best_est_gbc_SLAB_scaled.p', 'rb'))
-    est_wet, std_wet = pickle.load( open( 'best-ests/best_est_gbc_WET_scaled.p', 'rb'))
+    est_slab, std_slab = pickle.load( open( 'best-ests/nsj_best_est_gbc_SLAB_scaled.p', 'rb'))
+    est_wet, std_wet = pickle.load( open( 'best-ests/nsj_best_est_gbc_WET_scaled.p', 'rb'))
 
     # load fitted standardizers
 
@@ -118,4 +120,4 @@ if __name__=='__main__':
 
     # save outputs to pkl
     pickle.dump(outputs,
-            open('pkl/aspen_gbc_smoted_scaled_output.p','wb'))
+            open('pkl/nsj_gbc_smoted_scaled_output.p','wb'))
