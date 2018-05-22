@@ -83,18 +83,29 @@ if __name__=='__main__':
     X_smoted, y_smoted = smote(X_train.values, y_train.values, 0.60, k=None)
 
     # train model
-    params = {'criterion': 'gini',
+    params_slab = {'criterion': 'friedman_mse',
+        'learning_rate': 0.01,
+        'loss': 'exponential',
         'max_features': 'log2',
-        'min_samples_leaf': 10,
-        'min_samples_split': 8,
-        'n_estimators': 500,
-        'n_jobs': -1,
-        'oob_score': True,
+        'min_samples_leaf': 4,
+        'min_samples_split': 6,
+        'n_estimators': 400,
+        'subsample': 0.8,
         'verbose': 1}
 
-    model = RandomForestClassifier()
+    params_wet = {'criterion': 'friedman_mse',
+        'learning_rate': 0.05,
+        'loss': 'deviance',
+        'max_features': 'log2',
+        'min_samples_leaf': 5,
+        'min_samples_split': 5,
+        'n_estimators': 600,
+        'subsample': 0.4,
+        'verbose': 1}
+
+    model = GradientBoostingClassifier()
     # train
-    est, stndzr = train_estimator(model, params, X_smoted, y_smoted, standardize=True)
+    est, stndzr = train_estimator(model, params_wet, X_smoted, y_smoted, standardize=True)
     # predict
     y_hat, y_proba, importances = predict_classifier(X_test, y_test, est, stndzr)
     # print scores
@@ -102,4 +113,4 @@ if __name__=='__main__':
     print('case: {}'.format(case[0]))
     print_scores(y_test, y_hat, method_list)
 
-    pickle.dump((est, stndzr), open("best-ests/best_est_rfc_{}_scaled.p".format(case[0]), "wb"))
+    pickle.dump((est, stndzr), open("best-ests/best_est_gbc_{}_scaled.p".format(case[0]), "wb"))
