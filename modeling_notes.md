@@ -293,9 +293,12 @@ test accuracy = 0.935
 test recall = 0.892
 {'criterion': 'friedman_mse', 'learning_rate': 0.01, 'loss': 'exponential', 'max_features': 'log2', 'min_samples_leaf': 4, 'min_samples_split': 6, 'n_estimators': 400, 'subsample': 0.8, 'verbose': 1}
 
+case: WET
+test accuracy = 0.953
+test recall = 0.438
+{'criterion': 'friedman_mse', 'learning_rate': 0.05, 'loss': 'deviance', 'max_features': 'log2', 'min_samples_leaf': 5, 'min_samples_split': 5, 'n_estimators': 600, 'subsample': 0.4, 'verbose': 1}
 
-
-### results:
+### training results:
 __RFC__
 case: SLAB
 test accuracy_score = 0.946
@@ -306,3 +309,139 @@ case: WET
 test accuracy_score = 0.935
 test recall_score = 0.125
 test precision_score = 0.333
+
+__GBC__
+case: SLAB
+test accuracy_score = 0.935
+test recall_score = 0.892
+test precision_score = 0.868
+case: WET
+test accuracy_score = 0.953
+test recall_score = 0.438
+test precision_score = 0.636
+
+### test results:
+__RFC__
+slab
+acc: 0.9456521739130435
+prec: 0.8734177215189873
+rec: 0.9324324324324325
+wet
+acc: 0.9347826086956522
+prec: 0.3333333333333333
+rec: 0.125
+sum
+acc: 0.9021739130434783
+prec: 0.8607594936708861
+rec: 0.8095238095238095
+
+__GBC__
+slab
+acc: 0.9347826086956522
+prec: 0.868421052631579
+rec: 0.8918918918918919
+wet
+acc: 0.9528985507246377
+prec: 0.6363636363636364
+rec: 0.4375
+sum
+acc: 0.9018181818181819
+prec: 0.8481012658227848
+rec: 0.8170731707317073
+
+### class balance:
+1572 obs, 326 slab, 66 wet
+slab: 20%
+wet: 4.1%
+
+### zeroing in on a better model
+slab:
+y_train: 1296, 252 positive, 19%
+wet:
+y_train: 1296, 50 positive, 3.8%
+
+__no class balancing: rfc_best:__
+case: WET
+test accuracy_score = 0.946
+test recall_score = 0.125
+test precision_score = 0.667
+
+case: SLAB
+test accuracy_score = 0.928
+test recall_score = 0.851
+test precision_score = 0.875
+
+__class balancing: SMOTE 60%: rfc_best__
+slab:
+y_smoted: 2609, 1596 positive, 61%
+
+wet: 3115, 1869 positive, 60%
+
+case: SLAB
+test accuracy_score = 0.935
+test recall_score = 0.905
+test precision_score = 0.859
+
+case: WET
+test accuracy_score = 0.938
+test recall_score = 0.688
+test precision_score = 0.478
+
+__remove month__
+case: SLAB
+test accuracy_score = 0.931
+test recall_score = 0.878
+test precision_score = 0.867
+case: WET
+test accuracy_score = 0.931
+test recall_score = 0.562
+test precision_score = 0.429
+
+__standardized__
+case: WET
+test accuracy_score = 0.924
+test recall_score = 0.625
+test precision_score = 0.400
+
+case: SLAB
+test accuracy_score = 0.938
+test recall_score = 0.946
+test precision_score = 0.843
+
+__notes__
+month removed b/c linear with doy
+standardized data in train_ script
+need to move standardizer to predict script or merge them
+
+__standardized with month__
+__RFC:__
+slab
+acc: 0.942
+prec: 0.8625
+rec: 0.932
+
+wet
+acc: 0.916
+prec: 0.347
+rec: 0.5
+
+combined
+acc: 0.920
+prec: 0.878
+rec: 0.857
+
+__GBC:__
+slab
+acc: 0.938
+prec: 0.851
+rec: 0.932
+
+wet
+acc: 0.938
+prec: 0.476
+rec: 0.625
+
+combined
+acc: 0.920
+prec: 0.860
+rec: 0.880

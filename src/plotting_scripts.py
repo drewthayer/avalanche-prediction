@@ -64,10 +64,10 @@ def output_histograms(y_true, preds):
 
 def output_histograms_classification(prob1, prob2, prob3, labels):
     fig, ax = plt.subplots(1,3,figsize=(10,5))
-    ax[0].hist(prob1, 20, color='b', label=labels[0])
+    ax[0].hist(prob1, 50, color='b', label=labels[0])
     ax[0].legend()
-    ax[1].hist(prob2, 20, color='g', label=labels[1])
+    ax[1].hist(prob2, 50, color='g', label=labels[1])
     ax[1].legend()
-    ax[2].hist(prob3, 20, color='teal', label=labels[2])
+    ax[2].hist(prob3, 50, color='teal', label=labels[2])
     ax[2].legend()
     plt.show()

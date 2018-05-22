@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
 from ROC import ROC
+from sklearn.metrics import precision_recall_curve
 
 from plotting_scripts import feat_importance_plot, output_histograms_classification
 
@@ -13,33 +14,38 @@ def results_ts_plot(df, slab_proba, wet_proba):
     train_df = df[df.index <= splitdate]
     test_df = df[df.index > splitdate]
 
+    # n_avy for test, train, divided into slab, wet
     n_avy_train = train_df.N_AVY
     n_avy_test = test_df.N_AVY
+    test_df['N_SLAB'] = test_df.N_AVY * test_df.SLAB
+    test_df['N_WET'] = test_df.N_AVY * test_df.WET
 
     case = ['SLAB', 'WET']
-    c_t = ['r','g']
+    c_t = ['r','orange']
     c_p = ['b','g']
 
     # plot
     fig, ax1 = plt.subplots()
     ax1.set_xlabel('date')
     ax1.set_ylabel('daily # of avalanches')
-    h1 = ax1.fill(test_df.index, n_avy_test, c_t[0],
-                label='actual'.format(case[0]))
+    h1 = ax1.fill(test_df.index, test_df.N_SLAB, c_t[0],
+                label='actual {}'.format(case[0]))
+    h2 = ax1.fill(test_df.index, test_df.N_WET, c_t[1],
+                label='actual {}'.format(case[1]))
     ax1.tick_params(axis='x', rotation='auto')
-    ax1.set_ylim([0,10])
+    ax1.set_ylim([0,15])
 
     ax2 = ax1.twinx()
-    h2 = ax2.fill(test_df.index,slab_proba,c_p[0],
+    h3 = ax2.fill(test_df.index,slab_proba,c_p[0],
                 alpha = 0.3,
                 label='predicted {}'.format(case[0]))
-    h3 = ax2.fill(test_df.index,wet_proba,c_p[1],
+    h4 = ax2.fill(test_df.index,wet_proba,c_p[1],
                 alpha = 0.3,
                 label='predicted {}'.format(case[1]))
     ax2.set_ylabel('probability')
     ax2.set_ylim([0,1.01])
 
-    hh = h1 + h2 + h3
+    hh = h1 + h2 + h3 + h4
     h_labels = [h.get_label()  for h in hh]
     ax2.legend(hh, h_labels, loc=0)
     plt.title('Predictions: Aspen Zone')
@@ -70,7 +76,7 @@ if __name__=='__main__':
     df = pickle.load( open( 'pkl/aspen_d2_imputemean_alldays.p', 'rb'))
     # load model results
     y_true_l, y_hat_l, y_proba_l, feat_list, test_timestamps = pickle.load(
-            open( 'pkl/aspen_d2_gbc_best_output.p', 'rb'))
+            open( 'pkl/aspen_gbc_smoted_scaled_output.p', 'rb'))
 
     # probabilities
     slab_proba = y_proba_l[0][:,1]
@@ -108,7 +114,7 @@ if __name__=='__main__':
     results_ts_plot(df, slab_proba, wet_proba)
 
     # feature importances
-    label_list = ['rfc: slab', 'rfc: wet']
+    label_list = ['gbc: slab', 'gbc: wet']
     color_list = ['b','g']
     feat_sort_l = feature_importances(feat_list, label_list, color_list)
 
@@ -129,12 +135,21 @@ if __name__=='__main__':
         fpr_tpr_l.append((fpr, tpr))
 
         # apr plot
+        precision, recall, thresholds = precision_recall_curve(y_true.values,
+            y_proba, pos_label=1)
+        thresholds = np.append(thresholds, 1)
+        plt.plot(thresholds, recall, 'b--', label='recall')
+        plt.plot(thresholds, precision, 'g--', label='precision')
+        plt.legend()
+        plt.show()
+
         roc.a_r_p_plot(y_true, y_proba)
+
 
     # roc plot
     fig, ax = plt.subplots()
     for item, color, label in zip(fpr_tpr_l, colors, labels):
-        plt.plot(item[1], item[0], color=color, label=label)
+        plt.plot(item[0], item[1], color=color, label=label)
     plt.xlabel('False Positive rate')
     plt.ylabel('True Positive rate')
     plt.title('Receiver Operating Characteristic')
@@ -150,4 +165,11 @@ if __name__=='__main__':
     plt.xlabel('p() as fn of d-o-y')
     plt.ylabel('predicted p()')
     plt.legend()
+    plt.show()
+
+    # n_avy histogram
+    plt.hist(df.N_AVY[df.N_AVY > 0], 20)
+    plt.yscale('log', nonposy='clip')
+    plt.xlabel('# of avalanches')
+    plt.ylabel('count')
     plt.show()
