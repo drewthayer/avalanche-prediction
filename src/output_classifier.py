@@ -28,10 +28,11 @@ def results_ts_plot(df, slab_proba, wet_proba):
     fig, ax1 = plt.subplots()
     ax1.set_xlabel('date')
     ax1.set_ylabel('daily # of avalanches')
-    h1 = ax1.fill(test_df.index, test_df.N_SLAB, c_t[0],
+    # here (N_SLAB, N_WET) or N_AVY
+    h1 = ax1.fill(test_df.index, test_df.N_AVY, c_t[0],
                 label='actual {}'.format(case[0]))
-    h2 = ax1.fill(test_df.index, test_df.N_WET, c_t[1],
-                label='actual {}'.format(case[1]))
+    #h2 = ax1.fill(test_df.index, test_df.N_WET, c_t[1],
+    #            label='actual {}'.format(case[1]))
     ax1.tick_params(axis='x', rotation='auto')
     ax1.set_ylim([0,15])
 
@@ -45,7 +46,7 @@ def results_ts_plot(df, slab_proba, wet_proba):
     ax2.set_ylabel('probability')
     ax2.set_ylim([0,1.01])
 
-    hh = h1 + h2 + h3 + h4
+    hh = h1 + h3 + h4
     h_labels = [h.get_label()  for h in hh]
     ax2.legend(hh, h_labels, loc=0)
     plt.title('Predictions: Aspen Zone')

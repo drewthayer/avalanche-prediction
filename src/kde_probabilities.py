@@ -2,6 +2,13 @@ import pandas as pd
 import numpy as np
 import pickle
 from scipy.stats import gaussian_kde
+import matplotlib.pyplot as plt
+
+font = {'family' : 'normal',
+        'weight' : 'normal',
+        'size'   : 16}
+import matplotlib
+matplotlib.rc('font', **font)
 
 from transformation_scripts import water_year_day
 

@@ -6,7 +6,7 @@ def read_and_concat_snotel(directory, station_list):
     cols_raw = ['dt_string', 'swe_start_in', 'precip_start_in', 'airtemp_max_F', 'airtemp_min_F',
                     'airtemp_mean_F', 'precip_incr_in']
     data_list = []
-    for station in stationnames:
+    for station in station_list:
         snow_df = pd.read_csv(directory + '/' + 'snotel_{}.csv'.format(station),header=58)
         snow_df.columns = cols_raw
         snow_df = clean_snow_data(snow_df)
@@ -53,30 +53,35 @@ if __name__=='__main__':
     clean_dir = ''.join([current,'/../data/data-clean/'])
 
     # read snotel data
-    stationnames = ['618_mcclure_pass',
-                    '669_north_lost_trail',
-                    '737_schofield_pass',
-                    '542_independence_pass',
-                    '369_brumley',
-                    '547_ivanhoe']
-    snotel_df = read_and_concat_snotel(snotel_dir, stationnames)
+    stationnames_aspen = ['618_mcclure_pass',
+                        '669_north_lost_trail',
+                        '737_schofield_pass',
+                        '542_independence_pass',
+                        '369_brumley',
+                        '547_ivanhoe']
+
+    stationnames_nsj = ['713_red_mtn_pass',
+                        '538_idarado',]
+
+    snotel_df = read_and_concat_snotel(snotel_dir, stationnames_nsj)
 
     # read airport wind speed data
-    #airportfiles = ['aspen_pitkin_airport_20060101_current.csv',
+    #airportfiles_aspen = ['aspen_pitkin_airport_20060101_current.csv',
 #                    'leadville_lake_airport_20090101.csv',
 #                    'telluride_airport_20090101_20180417.csv']
-    airportfiles = ['telluride_airport_20090101_20180417.csv']
-    airport_df, name = read_and_concat_airport(lcd_dir, airportfiles)
+    #airportfiles = ['telluride_airport_20090101_20180417.csv']
+    airportfiles_nsj = ['montrose_airport_20060101_20081231.csv',
+                        'montrose_airport_20090101_20180405.csv']
+    airport_df, name = read_and_concat_airport(lcd_dir, airportfiles_nsj)
 
     # avalanche data
     caic_file = 'CAIC_avalanches_2010-05-07_2018-04-10.csv'
     avy_df = read_caic_data(caic_dir, caic_file)
-    #avy_aspen = avy_df[avy_df['BC Zone'] == 'Aspen']
 
     ''' write data to file '''
     # write clean data to new csv
-    #snotel_df.to_csv(clean_dir + 'snotel_data.csv')
-    #airport_df.to_csv(clean_dir + 'airport_data.csv')
+    snotel_df.to_csv(clean_dir + 'snotel_data_NSanJuan.csv')
+    airport_df.to_csv(clean_dir + 'airport_data_NSanJuan.csv')
     #avy_df.to_csv(clean_dir + 'avy_data.csv')
 
     # to append:

@@ -19,7 +19,7 @@ def binary_prob_plots(df):
 
 if __name__=='__main__':
     # load data
-    df = pickle.load( open( "pkl/aspen_d2_imputemean.p", "rb"))
+    df = pickle.load( open( "pkl/nsanjuan_data.p", "rb"))
 
     # test for nans
     na_per_col = np.sum(df.isna())
@@ -44,5 +44,5 @@ if __name__=='__main__':
         data = df[col].dropna()
         plt.hist(data, bins=20)
         plt.title(col)
-        plt.savefig('feature_hists/{}.png'.format(col),dpi=250)
+        plt.savefig('feature_hists_nsj/{}.png'.format(col),dpi=250)
         plt.close()
