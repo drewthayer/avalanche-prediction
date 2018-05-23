@@ -6,12 +6,27 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from scipy.stats import gaussian_kde
 
 font = {'family' : 'normal',
         'weight' : 'normal',
         'size'   : 16}
 import matplotlib
 matplotlib.rc('font', **font)
+
+def water_year_month(month):
+    if month >= 10:
+        month2 = month - 9
+    else:
+        month2 = month + 3
+    return month2
+
+def water_year_day(day):
+    if day >= 273:
+        day2 = day - 273
+    else:
+        day2 = day + 92
+    return day2
 
 if __name__=='__main__':
     avy_df = pd.read_csv('../../data/data-clean/avy_data.csv')
@@ -42,27 +57,35 @@ if __name__=='__main__':
     #plt.tight_layout()
     plt.show()
 
-
+    ''' water year month and day '''
     # water-year month feature
     month = pd.to_datetime(avy_df.Date).dt.month
-    def water_year_month(month):
-        if month >= 10:
-            month2 = month - 9
-        else:
-            month2 = month + 3
-        return month2
     avy_df['Month_wy'] = month.apply(lambda x: water_year_month(x))
-
-    def water_year_day(day):
-        if day >= 273:
-            day2 = day - 273
-        else:
-            day2 = day + 92
-        return day2
 
     dt = pd.to_datetime(avy_df.Date)
     doy = dt.apply(lambda x: x.timetuple().tm_yday)
     avy_df['DOY'] = doy.apply(lambda x: water_year_day(x))
+
+    ''' kde probabilities '''
+    feature_cols = [['SS','HS','L'], ['WL']]
+    dataframe = avy_df
+    target_col = 'DOY'
+    xx = np.linspace(1,366,365)
+    smooth = 0.35
+
+    def kde_probabilities(dataframe, feature_cols, target_col, xx, smooth):
+        probs_list = []
+        for features in feature_cols:
+            X = dataframe[np.in1d(avy_df.Type, features)][target_col]
+            density = gaussian_kde(X)
+            density.covariance_factor = lambda : smooth
+            density._compute_covariance()
+            probs = density(xx)
+            probs_list.append(probs)
+        return probs_list
+
+    probs_list = kde_probabilities(dataframe, feature_cols, target_col, xx, smooth)
+
 
     '''types of avalanches
     ['HS', 'SS', 'WL', 'WS', 'U', 'C', 'L', nan, 'G', 'R', 'SF', 'I'] '''
@@ -72,31 +95,6 @@ if __name__=='__main__':
     hs = avy_df[avy_df.Type == 'HS']
     ll = avy_df[avy_df.Type == 'L']
     slab = avy_df[np.in1d(avy_df.Type, ['SS','HS','L'])]
-
-    # #plot: histogram of slab vs wet 1
-    # fig, ax = plt.subplots()
-    # df_list = [slab, wl]
-    # names = ['slab', 'wet']
-    # colors = ['b','g']
-    # months = ['oct','nov','dec','jan','feb','mar','apr','may','jun','jul','aug','sep']
-    # d_month = {i:m for i, m in enumerate(months)}
-    #
-    # for idx, df in enumerate(df_list):
-    #     c = Counter(df.Month_wy)
-    #     for k,v in c.items():
-    #         plt.bar(k, v, color=colors[idx], alpha=0.5)
-    # plt.legend(names)
-    # plt.xlabel('Water Year Month')
-    # plt.xticks(range(12), months, rotation='vertical')
-    # plt.ylabel('# of avalanches')
-    # plt.title('Monthly distribution of avalanches by type')
-    # plt.tight_layout()
-    # plt.show()
-    #plt.savefig('../figs/eda/types_by_month.png',dpi=350)
-    #plt.close()
-
-    # same plot with different scales
-    #plot: histogram of slab vs wet 1
 
     df_list = [slab, wl]
     names = ['slab', 'wet']
@@ -112,28 +110,29 @@ if __name__=='__main__':
     fig, ax1 = plt.subplots()
     # ax 1
     for k,v in c_doy_list[0].items():
-        h1 = plt.bar(k, v, color='b', alpha=0.2, label='slab', width=10)
+        h1 = plt.bar(k, v, color='dodgerblue', alpha=0.2, label='slab', width=5)
     for k,v in c_doy_list[1].items():
-        h2 = plt.bar(k, v*4, color='g', alpha=0.2, label='wet', width=10)
-    ax1.set_ylabel('# avalanches')
+        h2 = plt.bar(k, v*4, color='forestgreen', alpha=0.2, label='wet', width=5)
+    ax1.set_ylabel('daily # avalanches')
     # ax 2
     ax2 = ax1.twinx()
-    h3 = plt.plot(xx, probs_list[0], 'b')
-    h4 = plt.plot(xx, probs_list[1]/4, 'g')
+    h3 = plt.plot(xx, probs_list[0], 'b', linewidth=4)
+    h4 = plt.plot(xx, probs_list[1]/4, 'g', linewidth=4)
 
-    ax2.set_ylim([0,0.012])
+    ax2.set_ylim([0,0.015])
     ax2.set_ylabel('probability')
 
-    plt.legend(names)
+    plt.legend(['p(slab)', 'p(wet)'])
     # ax = plt.gca()
     # leg = ax.get_legend()
     # leg.legendHandles[0].set_color('b')
     # leg.legendHandles[1].set_color('g')
 
     #plt.xlabel('Water Year Month')
-    plt.xticks(np.linspace(30,360,12), months, rotation='vertical')
+    plt.xticks(np.linspace(30,360,12), months, rotation='diagonal')
+    #plt.xticks(np.linspace(30,360,12), np.linspace(30,360,12))
     #plt.ylabel('# of avalanches')
-    plt.title('daily distribution of slab vs. wet avalanches')
+    plt.title('seasonal distribution of slab vs. wet avalanches')
     plt.tight_layout()
     plt.show()
 
@@ -182,18 +181,9 @@ if __name__=='__main__':
     plt.legend(hh, h_labels, loc=0)
     plt.show()
 
-    ''' kde of types '''
 
-    # prep data for KDE
-    # X_count = np.zeros((len(c), 2))
-    # items = [x for x in c.items()]
-    # sort = sorted(items, key = lambda x: x[0])
-    # for i in range(X.shape[0]):
-    #     X_count[i][0] = sort[i][0]
-    #     X_count[i][1] = sort[i][1]
 
-    # scipy stats kde
-    from scipy.stats import gaussian_kde
+    # scipy stats hist, kde
     xx = np.linspace(1,12,100)
     colors = ['b','g']
 
@@ -213,25 +203,7 @@ if __name__=='__main__':
     plt.tight_layout()
     plt.show()
 
-    ''' kde probabilities'''
-    feature_cols = [['SS','HS','L'], ['WL']]
-    dataframe = avy_df
-    target_col = 'DOY'
-    xx = np.linspace(1,366,365)
-    smooth = 0.35
 
-    def kde_probabilities(dataframe, feature_cols, target_col, xx, smooth):
-        probs_list = []
-        for features in feature_cols:
-            X = dataframe[np.in1d(avy_df.Type, features)][target_col]
-            density = gaussian_kde(X)
-            density.covariance_factor = lambda : smooth
-            density._compute_covariance()
-            probs = density(xx)
-            probs_list.append(probs)
-        return probs_list
-
-    probs_list = kde_probabilities(dataframe, feature_cols, target_col, xx, smooth)
 
     ''' dsize figure '''
     dd = avy_df[avy_df.Dsize.notnull()]['Dsize']
@@ -273,3 +245,29 @@ if __name__=='__main__':
     plt.ylabel('count')
     plt.tight_layout()
     plt.show()
+
+    # old hist plot
+    # #plot: histogram of slab vs wet 1
+    # fig, ax = plt.subplots()
+    # df_list = [slab, wl]
+    # names = ['slab', 'wet']
+    # colors = ['b','g']
+    # months = ['oct','nov','dec','jan','feb','mar','apr','may','jun','jul','aug','sep']
+    # d_month = {i:m for i, m in enumerate(months)}
+    #
+    # for idx, df in enumerate(df_list):
+    #     c = Counter(df.Month_wy)
+    #     for k,v in c.items():
+    #         plt.bar(k, v, color=colors[idx], alpha=0.5)
+    # plt.legend(names)
+    # plt.xlabel('Water Year Month')
+    # plt.xticks(range(12), months, rotation='vertical')
+    # plt.ylabel('# of avalanches')
+    # plt.title('Monthly distribution of avalanches by type')
+    # plt.tight_layout()
+    # plt.show()
+    #plt.savefig('../figs/eda/types_by_month.png',dpi=350)
+    #plt.close()
+
+    # same plot with different scales
+    #plot: histogram of slab vs wet 1
