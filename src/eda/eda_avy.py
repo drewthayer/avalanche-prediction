@@ -246,6 +246,57 @@ if __name__=='__main__':
     plt.tight_layout()
     plt.show()
 
+    ''' most frequent backcountry zones '''
+    d2df = avy_df[np.in1d(avy_df.Dsize,['D2','D2.5','D3','D3.5','D4'])]
+    c_zone = Counter(d2df['BC Zone'])
+    zone_keys = sorted(c_zone, key=c_zone.get)
+    zone_vals = [c_zone[k] for k in zone_keys]
+    alphas = np.linspace(0,1,len(zone_keys))
+    fig, ax = plt.subplots()
+    for k, v, alpha in zip(zone_keys, zone_vals, alphas):
+        plt.barh(k,v, color='b', alpha=alpha)
+    plt.xlabel('total # avalanches observed')
+    plt.tight_layout()
+    plt.show()
+
+    ''' most frequent locations '''
+    c_loc = Counter(avy_df.Landmark)
+    # list of sorted tuples:
+    srt_tupes = sorted(c_loc.items(), key=lambda x: x[1], reverse=True)
+
+    # list of sorted keys
+    srt_keys = sorted(c_loc, key=c_loc.get, reverse=True)
+    # list of matching sorted values
+    vals = [c_loc[x] for x in srt_keys]
+
+    # lat, long for most frequent
+    top20 = ['Red Mountain Pass',
+             'Marble',
+             '10-mile Range',
+             'Ophir',
+             'Berthoud Pass west side',
+             'Ruby Range',
+             'Wolf Creek Pass',
+             'Cement Creek',
+             'Loveland Pass-Southside',
+             'Vail Pass',
+             'Lizard Head Pass',
+             'Mosquito Range',
+             'Red Mountain Pass--Eastside',
+             'Gore Range',
+             'Rocky Mountain National Park',
+             'Mount Emmons',
+             'Sawatch Range',
+             'Richmond Hill',
+             'Independence Pass-East side',
+             'Ashcroft']
+    top_df = avy_df[np.in1d(avy_df.Landmark, top20)]
+
+    # map: most frequent
+    import folium
+
+
+
     # old hist plot
     # #plot: histogram of slab vs wet 1
     # fig, ax = plt.subplots()

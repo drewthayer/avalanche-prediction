@@ -15,21 +15,9 @@ http://avalanche.state.co.us
 ### Data sources:
 __Colorado Avalanche Information Center data__ (Colorado Department of Natural Resources)
 
-| 10 Backcountry Zones | Distribution |
+| 10 Backcountry Zones | Avalanche observations |
 |----|----|
-|<img alt="caic zones" src="/figs/pub_figs/CAIC_zones.png" width='300'> | # |
-
-__D2+ avalanches by backcountry zone:__
-- Northern San Juan        2998
-- Front Range              1565
-- Vail & Summit County     1337
-- Aspen                    1210
-- Gunnison                 1188
-- Sawatch Range             806
-- Southern San Juan         585
-- Steamboat & Flat Tops     186
-- Grand Mesa                155
-- Sangre de Cristo           22
+|<img alt="caic zones" src="/figs/pub_figs/CAIC_zones.png" width='300'> | <img alt="caic zones" src="/figs/eda/zone_histogram.png" width='300'> |
 
 avalanche observation data back to 1980:
 
