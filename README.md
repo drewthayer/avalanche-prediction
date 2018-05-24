@@ -88,16 +88,18 @@ __best model: random forest classifier__
  - literature: features used in avalanche modeling study in Little Cottonwood Canyon, UT
    - _Blatternberger and Fowles, 2016. Treed Avalanche Forecasting: Mitigating Avalanche Danger Utilizing Bayesian Additive Regression Trees. Journal of Forecasting, J. Forecast. 36, 165–180 (2017). DOI: 10.1002/for.2421_
 
- __probabilities of slab/ wet avalanches:__
+### Feature augmentation: probability of slab/ wet avalanches:
   - slab and wet avalanches have overlapping, yet different seasons:
-<img alt='timeseries' src='figs/eda/types_by_month_slab_WL.png' width='500'>
+<img alt='kde hist' src='figs/eda/kde_hist_scaled.png' width='500'>
 
   - relative probability modeled as Gaussian KDE function:
-<img alt='timeseries' src='figs/eda/types_by_day_nonorm.png' width='500'>
+  - p(slab), p(wet) as function of day-of-year
+    - _for water year, starting on october 1_
+  - $\Sigma (p_{slab}, p_{wet}) = p_{avalanche}$
 
-  - each day, calculate p(slab) and p(wet) as function of day-of-water-year
+### ensemble of 2 models:
+<img alt='model flow' src='figs/pub_figs/model_flowchart.png' width='500'>
 
-### modeling:
 __training:__
  - training data: Aspen Zone, period of record from 2010-2016, CAIC records for D rating > 2 avalanches
  - target: binary label for occurence of any avalanches with D rating > 2
@@ -108,5 +110,5 @@ __training:__
 __testing:__
 - test data: 2016 - 2018 period of record
 - predict probability of positive class with each model (slab/wet avalanche occured)
-- add probabilities: $\Sigma p_{slab}, p_{wet} = p_{avalanche}$
+
 - evaluate model accuracy and recall  
