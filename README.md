@@ -67,9 +67,9 @@ __best model: random forest classifier__
 
 ### feature engineering
  - use features that control the physical processes that create avalanche conditions:
-   - snowfall, wind, temperature
+   - snowfall, wind, temperature, including time-lagged features 
  - literature: features used in avalanche modeling study in Little Cottonwood Canyon, UT
-   - _Blatternberger and Fowles, 2016. Treed Avalanche Forecasting: Mitigating Avalanche Danger Utilizing Bayesian Additive Regression Trees. Journal of Forecasting, J. Forecast. 36, 165–180 (2017). DOI: 10.1002/for.2421_
+   - _Blatternberger and Fowles, 2016._ (refs at end)
 
 ### Feature augmentation: probability of slab/ wet avalanches:
   - slab and wet avalanches have overlapping, yet different seasons:
@@ -89,12 +89,23 @@ __training:__
  - separate targets for slab and wet occurence
  - separate models for slab and wet avalanches
    - each model does not include # or probability of other type of avalanche
+ - optimize model for recall with 10-fold cross-validation
+ - grid search over parameters using Amazon AWS EC2
 
-__testing:__
-- test data: 2016 - 2018 period of record
-- predict probability of positive class with each model (slab/wet avalanche occured)
 
-- evaluate model accuracy and recall  
+### validation results: Aspen zone, 2016-2017 season
+
+<img alt='model flow' src='figs/classifier_smote_scaled/gbc_ts_fig2.png' width='500'>
+
+__results figure:__
+- days with an avalanche are marked with an orange bar
+- predicted probabilities plotted in blue or green (range 0 to 1)
+- Each model predicts the probability of a slab or wet avalanche, respectively
+
+__notes:__
+- seasonal sense: slab avalanches predicted in winter, wet avalanches in spring
+- high recall: all days with true events have a prediction
+- lower precision: some false positives in the spring
 
 ### ensemble model feature importances:
 
@@ -114,9 +125,13 @@ __notable differences that make physical sense:__
    - positive relationship in wet model (i.e. p(wet) increases with warm day temps)
    - inverse relationship in slab model (i.e., p(slab) decreases with warm day temps)
 
+| Slab model partial dependence | Wet model partial dependence |
+|----|----|
+| ![](figs/pdep_plots/pdep_TMAX_slab.png) | ![](figs/pdep_plots/pdep_TMAX_wet.png) |
+
  - Snowpack features:
-   - 'SNOW_DAY' important in slab model
-   - 'SETTLE' important in wet model
+   - 'SNOW_4DAY' important in slab model: 4 day snow loading
+   - 'SETTLE' important in wet model: 24 hour snowpack settling
 
 ### modeling metrics
 __best model results:__
@@ -145,6 +160,25 @@ naive: zeros
 accuracy: 0.717
 precision: 1.0
 recall: 0.0714
+
+![](figs/pub_figs/slideshow_credits.png)
+
+### References:
+Data:
+ - Colorado Avalanche Information Center, CO Dept of Natural Resources
+ - SNOTEL, Natural Resource Conservation Service, USDA
+Local Climatological Data, National Climatic Data Center, NOAA
+
+Research:
+ - Blatternberger and Fowles, 2016. Treed Avalanche Forecasting: Mitigating Avalanche Danger Utilizing Bayesian Additive Regression Trees. Journal of Forecasting, J. Forecast. 36, 165–180 (2017). DOI: 10.1002/for.2421
+
+Images:
+ - opening image: Staying Alive in Avalanche Terrain, Bruce Tremper, The Mountaineers Books
+- sensor images: NRCS, NOAA
+- slab example: The Avalanche Review, VOL. 29, NO. 3, FEBRUARY
+-  wet slide example:  Colorado Avalanche Information Center
+- closing shot: Annie Hancock in Rocky Mountain National Park, CO. photo: Drew Thayer
+
 
 __directory structure:__
 ~~~
