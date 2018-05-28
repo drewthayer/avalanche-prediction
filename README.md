@@ -21,23 +21,21 @@ __Colorado Avalanche Information Center data__ (Colorado Department of Natural R
 
 avalanche observation data back to 1980:
 
-<img alt="caic zones" src="/figs/pub_figs/caic_example.png" width='500'>
+<img alt="caic zones" src="/figs/pub_figs/caic_example.png" width='300'>
 
 features: _date, zone, type, size_
 
 __weather data__
 SNOTEL sensor network (NRCS, USDA):
+ - daily snow height, new snow height, snow-water-equivalent, and max,min,mean air temperature
+ - spatial distribution:
 
-<img alt="snotel network" src="/figs/pub_figs/co_swe_current.png" width='500'>
-
-<img alt="snotel network" src="/figs/pub_figs/nrcs_snotel_eyak_ak.jpg" width='200'>
+<img alt="current swe" src="/figs/pub_figs/co_swe_current.png" width='300'>
 
 _source: NRCS National Water and Climate Center, USDA_
 
 Local Climatalogical Data (commonly airports):
-
-<img alt="airport station" src="/figs/pub_figs/airport_weather_station.JPG" width='200'>
-
+ - peak, sustained wind speed
 
 ### Model development: training data
 |Where            |  Which events | How frequent? |
@@ -47,7 +45,7 @@ Local Climatalogical Data (commonly airports):
 __Backcountry Zone:__ Aspen, CO
 __Destructive size:__ D2 or greater
 __Training data:__ 2011-2016 winters (6 seasons)
-__Validation data:__ 2017-2018 winter
+__Validation data:__ 2017-2017 winter
 
 #### modeling strategy:
 __classification model:__
@@ -67,7 +65,7 @@ __best model: random forest classifier__
 
 ### feature engineering
  - use features that control the physical processes that create avalanche conditions:
-   - snowfall, wind, temperature, including time-lagged features 
+   - snowfall, wind, temperature, including time-lagged features
  - literature: features used in avalanche modeling study in Little Cottonwood Canyon, UT
    - _Blatternberger and Fowles, 2016._ (refs at end)
 
