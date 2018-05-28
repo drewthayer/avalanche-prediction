@@ -6,6 +6,7 @@ import scipy.stats as stats
 from ROC import ROC
 from sklearn.metrics import precision_recall_curve
 
+from modeling_scripts import feature_importances
 from plotting_scripts import feat_importance_plot, output_histograms_classification
 
 def results_ts_plot(df, slab_proba, wet_proba):
@@ -53,17 +54,6 @@ def results_ts_plot(df, slab_proba, wet_proba):
     plt.tight_layout()
     plt.show()
 
-def feature_importances(feat_list, label_list, color_list):
-    feat_sort_l = []
-    for item, label, color in zip(feat_list, label_list, color_list):
-        names = list(item[0])
-        importances = item[1]
-        # make ordered list
-        feat_sort_l.append(sorted(zip(names, importances),
-                key=lambda x:abs(x[1]), reverse=True))
-        # plot
-        feat_importance_plot(names, importances, label, color, figsize=(6,6))
-    return feat_sort_l
 
 def idx_prediction(slab_proba, wet_proba, sum_proba, test_timestamps, idx):
     print('p(slab) = {:0.3f}'.format(slab_proba[idx]))

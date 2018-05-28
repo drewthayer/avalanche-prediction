@@ -38,11 +38,6 @@ Local Climatalogical Data (commonly airports):
 
 <img alt="airport station" src="/figs/pub_figs/airport_weather_station.JPG" width='200'>
 
-### avalanche trends:
-
-
-
-
 
 ### Model development: training data
 |Where            |  Which events | How frequent? |
@@ -100,3 +95,53 @@ __testing:__
 - predict probability of positive class with each model (slab/wet avalanche occured)
 
 - evaluate model accuracy and recall  
+
+### ensemble model feature importances:
+
+| slab model | wet model |
+|---|---|
+| ![](figs/classifier_smote_scaled/gbc_feats_slab.png) |![](figs/classifier_smote_scaled/gbc_feats_wet.png) |
+
+__similarities:__
+ - same relative order of feature groups:
+   1. date, storm cycle features
+   2. temperature features
+   3. snowpack features
+   4. wind speed features
+
+__notable differences that make physical sense:__
+ - 'TMAX' important in both (7th, 5th, respectively), but partial dependence plots show:
+   - positive relationship in wet model (i.e. p(wet) increases with warm day temps)
+   - inverse relationship in slab model (i.e., p(slab) decreases with warm day temps)
+
+ - Snowpack features:
+   - 'SNOW_DAY' important in slab model
+   - 'SETTLE' important in wet model
+
+### modeling metrics
+__best model results:__
+
+|   | p(slab) | p(wet) | p(slab + wet) |
+|-----|-----|-----|-----|
+| accuracy | 0.938 | 0.938 | 0.920 |
+| precision | 0.851 | 0.476 | 0.860 |
+| recall | 0.932 | 0.625 | 0.880 |
+
+__best model parameters:__ (determined by grid search on AWS EC2, optimized for recall)
+ - gradient boosting classifier, slab:
+   - {'criterion': 'friedman_mse', 'learning_rate': 0.01, 'loss': 'exponential', 'max_features': 'log2', 'min_samples_leaf': 4, 'min_samples_split': 6, 'n_estimators': 400, 'subsample': 0.8}
+
+ - gradient boosting classifier, wet:
+   - {'criterion': 'friedman_mse', 'learning_rate': 0.05, 'loss': 'deviance', 'max_features': 'log2', 'min_samples_leaf': 5, 'min_samples_split': 5, 'n_estimators': 600, 'subsample': 0.4}
+
+__check against naive model:__
+
+naive: ones
+accuracy: 0.282
+precision: 0.288
+recall: 0.928
+
+naive: zeros
+accuracy: 0.717
+precision: 1.0
+recall: 0.0714
