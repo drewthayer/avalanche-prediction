@@ -10,34 +10,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pdb
 
-def train_test_split_time(df, splitdate_str, y_col):
-    splitdate = pd.to_datetime(splitdate_str)
-    train_df = df[df.index <= splitdate]
-    test_df = df[df.index > splitdate]
-
-    # train set
-    X_train = train_df.copy()
-    y_train = X_train.pop(y_col)
-    # test set
-    X_test = test_df.copy()
-    y_test = X_test.pop(y_col)
-
-    return X_train, y_train, X_test, y_test
-
-def predict_classifier(X_test, y_test, est, standardizer):
-    ''' applies .predict() method of fitted classifier to X,y data '''
-    pdb.set_trace()
-    X_scaled = standardizer.transform(X_test)
-    y_hat = est.predict(X_scaled)
-    y_proba = est.predict_proba(X_scaled)
-    importances = est.feature_importances_
-    return y_hat, y_proba, importances
-
-def print_scores(y_true, y_hat, method_list):
-    for method in method_list:
-        score = method(y_true, y_hat)
-        print('test {} = {:0.3f}'.format(method.__name__, score))
-
 def multi_case_classifier_predict(df, cases, ests, stdzrs,
                 n_oversamps, c_true, c_pred):
     y_true_l = []
@@ -76,20 +48,6 @@ def multi_case_classifier_predict(df, cases, ests, stdzrs,
         method_list = [accuracy_score, recall_score, precision_score]
         print_scores(y_test, y_hat, method_list)
 
-    #     # plot
-    #     h1 = ax.plot(test_datetime,y_test,c_t,
-    #                 label='actual {}'.format(case[0]))
-    #     h2 = ax.plot(test_datetime,y_hat,c_p,
-    #                 linestyle = 'dashed',
-    #                 label='predicted {}'.format(case[0]))
-    #     ax.set_ylabel('daily # of avalanches')
-    #     ax.set_title('Aspen, CO: avalanches >= D2')
-    # plt.legend()
-    # #plt.xticks(test_datetime, rotation='vertical')
-    # plt.show()
-    # #plt.savefig('../figs/rfr_d2_slabwet.png', dpi=250)
-    # #plt.close()
-
     return y_true_l, y_hat_l, y_proba_l, feats_l, list(y_test.index)
 
 
@@ -104,8 +62,6 @@ if __name__=='__main__':
     #load fitted models
     est_slab, std_slab = pickle.load( open( 'best-ests/nsj_best_est_gbc_SLAB_scaled.p', 'rb'))
     est_wet, std_wet = pickle.load( open( 'best-ests/nsj_best_est_gbc_WET_scaled.p', 'rb'))
-
-    # load fitted standardizers
 
     ''' N_AVY when case = slab/wet '''
     params = {
