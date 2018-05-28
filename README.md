@@ -145,3 +145,25 @@ naive: zeros
 accuracy: 0.717
 precision: 1.0
 recall: 0.0714
+
+__directory structure:__
+.
+├── README.md
+├── data
+│   ├── data-LCD
+│   │   ├── raw LCD airport data (.csv)
+│   ├── data-caic
+│   │   ├── raw CAIC data (.csv)
+│   ├── data-clean
+│   │   ├── cleaned data (.csv)
+│   └── data-snotel
+│       ├── raw snotel files (.csv)
+├── data_sources.md
+├── development
+│   ├── py scripts and .pkl files
+├── figs
+│   ├── all figures
+├── model_features.md
+├── modeling_notes.md
+└── src
+    ├── source code: python scripts, .pkl files
