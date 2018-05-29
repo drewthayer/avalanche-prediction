@@ -29,6 +29,7 @@
    - output:
      - fitted estimator and standardizer, as pickle
      - saves one set for each of two cases: 'slab' and 'wet'
+
   __predict_fitted_classifier.py__
    - input: (.pkl)
      - cleaned and engineered feature matrix as pandas df
@@ -36,11 +37,16 @@
    - output:
      - predicted binary and predicted probability for both cases
      - feature names and importances
+     
   __output_classifier.py__
    - input: (.pkl)
      - outputs from predictions
    - output:
-     - figures 
+     - figures
+
+#### ancillary: grid search scripts
+  __train_classifier_gridsearch_gbc.py__ (or rfc version)
+   - train model with large grid of parameters using SkLearn GridSearchCV
 ~~~
 /project
   /data
