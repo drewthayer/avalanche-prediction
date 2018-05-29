@@ -1,4 +1,3 @@
-Readme
 ## Empirical avalanche prediction in Colorado:
 #### Can a machine-learning model trained on historical climate, snow, and avalanche data augment prediction of avalanche risk?
 

@@ -1,27 +1,46 @@
-### src folder readme
-
 ### Avalanche prediction processing pipeline
 
 #### data: .csv files in /data/
 
 #### data cleaning
   __clean_data.py__
-   - in: .csv
-   - out: .csv
+   - input: .csv
+   - output: .csv
+   - actions: read data, make format corrections, save as .csv files
    - scripts:
       - cleaning_scripts.py
 
 #### feature engineering
   __feature_engineering.py__
-   - in: .csv
-   - out: .pkl
-   - actions: engineer features, engineer ts lag features,
+   - input: .csv
+   - output: .pkl
+   - actions:
+     - engineer features
+     - convert dates to water year
+     - engineer timeseries lag features
+     - impute NaNs (with mean or other value)
    - scripts:
       - transformation_scripts.py
 
 #### modeling
-   - run_model_2options.py
-
+  __train_classifier_gbc.py__ (or train_classifier_rfc.py)
+   - input: (.pkl)
+     - cleaned and engineered feature matrix as pandas df
+   - output:
+     - fitted estimator and standardizer, as pickle
+     - saves one set for each of two cases: 'slab' and 'wet'
+  __predict_fitted_classifier.py__
+   - input: (.pkl)
+     - cleaned and engineered feature matrix as pandas df
+     - fitted estimator and standardizer
+   - output:
+     - predicted binary and predicted probability for both cases
+     - feature names and importances
+  __output_classifier.py__
+   - input: (.pkl)
+     - outputs from predictions
+   - output:
+     - figures 
 ~~~
 /project
   /data
@@ -54,7 +73,7 @@
 
 ~~~
 
-dataframe sizes:
+__dataframe sizes:__
 
 clean_data outputs:
  - avy_df: (10151, 40)
@@ -71,28 +90,6 @@ feature_engineering
     - zone_df:  (510, 9), float and int
  - outputs:
     -merge_all: (510, 24), float and int
-
- - nans:
-N_AVY                   0
-MONTH                   0
-DOY                     0
-N_AVY_24                0
-DSUM_24                 0
-P_SLAB                  0
-P_WET                   0
-WET                     0
-SLAB                    0
-WSP_SSTN_aspen         64
-WSP_PEAK_aspen         65
-WSP_SSTN_leadville     76
-WSP_PEAK_leadville     91
-DEPTH                  46
-GRTR_60                46
-SNOW_24                46
-SNOW_4DAY              46
-SWE_24                 46
-DENSE_24              306
-SETTLE                306
 
 __directory structure:__
 ~~~
