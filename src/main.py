@@ -3,6 +3,7 @@
     and model training and prediction '''
 
 import clean_data
+import test
 
 if __name__=='__main__':
-    clean_data()
+    test
