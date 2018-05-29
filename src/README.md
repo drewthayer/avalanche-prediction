@@ -1,16 +1,16 @@
 ### Avalanche prediction processing pipeline
 
-#### data: .csv files in /data/
+### data: .csv files in /data/
 
-#### data cleaning
+### data cleaning
   __clean_data.py__
    - input: .csv
    - output: .csv
    - actions: read data, make format corrections, save as .csv files
-   - scripts:
+   - script dependencies:
       - cleaning_scripts.py
 
-#### feature engineering
+### feature engineering
   __feature_engineering.py__
    - input: .csv
    - output: .pkl
@@ -19,16 +19,18 @@
      - convert dates to water year
      - engineer timeseries lag features
      - impute NaNs (with mean or other value)
-   - scripts:
+   - script dependencies:
       - transformation_scripts.py
 
-#### modeling
+### modeling
   __train_classifier_gbc.py__ (or train_classifier_rfc.py)
    - input: (.pkl)
      - cleaned and engineered feature matrix as pandas df
    - output:
      - fitted estimator and standardizer, as pickle
      - saves one set for each of two cases: 'slab' and 'wet'
+   - script dependencies:
+      - transformation_scripts.py, modeling_scripts.py
 
   __predict_fitted_classifier.py__
    - input: (.pkl)
@@ -37,16 +39,26 @@
    - output:
      - predicted binary and predicted probability for both cases
      - feature names and importances
-     
+
   __output_classifier.py__
    - input: (.pkl)
      - outputs from predictions
    - output:
      - figures
 
-#### ancillary: grid search scripts
+### ancillary: grid search scripts
   __train_classifier_gridsearch_gbc.py__ (or rfc version)
    - train model with large grid of parameters using SkLearn GridSearchCV
+
+### ancillary: eda, visualization, etc
+  - EDA scripts in src/eda/
+  - kde_probabilities.py
+    - models probability of slab/wet avalanche as a Gaussian KDE
+    - script dependencies
+      - transformation_scripts.py
+  - ts_results_plot.py
+    - makes a timeseries plot of results: actual and predicted 
+
 ~~~
 /project
   /data
