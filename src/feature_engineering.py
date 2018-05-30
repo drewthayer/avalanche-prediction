@@ -173,7 +173,7 @@ if __name__=='__main__':
     airport_df = pd.read_csv(clean_dir + 'airport_data_NSanJuan.csv')
     snotel_df = pd.read_csv(clean_dir + 'snotel_data_NSanJuan.csv')
 
-    # impute here
+    # impute missing values 
     avy_imputed = df_simple_impute(avy_df, method='mean')
     airport_imputed = df_simple_impute(airport_df, method='mean')
     snotel_imputed = df_simple_impute(snotel_df, method='mean')
@@ -194,15 +194,6 @@ if __name__=='__main__':
     snow_df = df_simple_impute(snow_df, method='zero') # impute zero for engineered features
     pickle.dump( snow_df, open( "pkl/snow_df.p", "wb" ) )
 
-
-    # remove 2018 data
-    #snow_df.drop(snow_df[snow_df.year == 2018].index, inplace=True)
-
-    # remove rows with swe=0
-    #snow_df.drop(snow_df[snow_df.swe_start_m == 0].index, inplace=True)
-
-    # remove september data (highly volatile and uncharacteristic)
-    #snow_df.drop(snow_df[snow_df.month == 9].index, inplace=True)
     stationnames = ['618_mcclure_pass',
                     '669_north_lost_trail',
                     '737_schofield_pass',

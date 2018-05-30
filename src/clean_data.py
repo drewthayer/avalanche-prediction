@@ -69,7 +69,6 @@ if __name__=='__main__':
     #airportfiles_aspen = ['aspen_pitkin_airport_20060101_current.csv',
 #                    'leadville_lake_airport_20090101.csv',
 #                    'telluride_airport_20090101_20180417.csv']
-    #airportfiles = ['telluride_airport_20090101_20180417.csv']
     airportfiles_nsj = ['montrose_airport_20060101_20081231.csv',
                         'montrose_airport_20090101_20180405.csv']
     airport_df, name = read_and_concat_airport(lcd_dir, airportfiles_nsj)
