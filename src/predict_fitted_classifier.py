@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pdb
 
+from modeling_scripts import train_test_split_time, train_estimator
+from modeling_scripts import predict_classifier, print_scores
+
 def multi_case_classifier_predict(df, cases, ests, stdzrs,
                 n_oversamps, c_true, c_pred):
     y_true_l = []
@@ -53,7 +56,7 @@ def multi_case_classifier_predict(df, cases, ests, stdzrs,
 
 if __name__=='__main__':
     # load data
-    df = pickle.load( open( 'pkl/aspen_d2_imputemean_alldays.p', 'rb'))
+    df = pickle.load( open( 'pkl/nsanjuan_data.p', 'rb'))
     df.drop('N_AVY', axis=1, inplace=True)
     #df.drop('MONTH', axis=1, inplace=True)
     # fill na with zero in case any not imputed

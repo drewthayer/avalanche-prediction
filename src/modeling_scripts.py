@@ -1,6 +1,8 @@
 import pandas as pd
 import pickle
 import numpy as np
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 def train_test_split_time(df, splitdate_str, y_col):
     splitdate = pd.to_datetime(splitdate_str)
@@ -29,7 +31,6 @@ def train_estimator(est, params, X_train, y_train, standardize=True):
 
 def predict_classifier(X_test, y_test, est, standardizer):
     ''' applies .predict() method of fitted classifier to X,y data '''
-    pdb.set_trace()
     X_scaled = standardizer.transform(X_test)
     y_hat = est.predict(X_scaled)
     y_proba = est.predict_proba(X_scaled)
@@ -40,15 +41,3 @@ def print_scores(y_true, y_hat, method_list):
     for method in method_list:
         score = method(y_true, y_hat)
         print('test {} = {:0.3f}'.format(method.__name__, score))
-
-def feature_importances(feat_list, label_list, color_list):
-    feat_sort_l = []
-    for item, label, color in zip(feat_list, label_list, color_list):
-        names = list(item[0])
-        importances = item[1]
-        # make ordered list
-        feat_sort_l.append(sorted(zip(names, importances),
-                key=lambda x:abs(x[1]), reverse=True))
-        # plot
-        feat_importance_plot(names, importances, label, color, figsize=(6,6))
-    return feat_sort_l

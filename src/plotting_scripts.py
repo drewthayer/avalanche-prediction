@@ -45,6 +45,18 @@ def feat_importance_plot(names, importances, label, color, figsize=(8,8), alpha=
     #plt.savefig(filename,dpi=dpi)
     plt.show()
 
+def feature_importances(feat_list, label_list, color_list):
+    feat_sort_l = []
+    for item, label, color in zip(feat_list, label_list, color_list):
+        names = list(item[0])
+        importances = item[1]
+        # make ordered list
+        feat_sort_l.append(sorted(zip(names, importances),
+                key=lambda x:abs(x[1]), reverse=True))
+        # plot
+        feat_importance_plot(names, importances, label, color, figsize=(6,6))
+    return feat_sort_l
+
 def output_histograms(y_true, preds):
     fig, ax = plt.subplots(1,2, figsize=(12,6))
     ax[0].hist(y_true[0][y_true[0] > 0],20, color='b', label='true')

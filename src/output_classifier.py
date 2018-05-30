@@ -6,8 +6,7 @@ import scipy.stats as stats
 from ROC import ROC
 from sklearn.metrics import precision_recall_curve
 
-from modeling_scripts import feature_importances
-from plotting_scripts import feat_importance_plot, output_histograms_classification
+from plotting_scripts import feature_importances, output_histograms_classification
 
 def results_ts_plot(df, slab_proba, wet_proba):
     # get train, test avy data
@@ -64,10 +63,10 @@ def idx_prediction(slab_proba, wet_proba, sum_proba, test_timestamps, idx):
 
 if __name__=='__main__':
     # load data
-    df = pickle.load( open( 'pkl/aspen_d2_imputemean_alldays.p', 'rb'))
+    df = pickle.load( open( 'pkl/nsanjuan_data.p', 'rb'))
     # load model results
     y_true_l, y_hat_l, y_proba_l, feat_list, test_timestamps = pickle.load(
-            open( 'pkl/aspen_gbc_smoted_scaled_output.p', 'rb'))
+            open( 'pkl/nsj_gbc_smoted_scaled_output.p', 'rb'))
 
     # probabilities
     slab_proba = y_proba_l[0][:,1]
