@@ -1,4 +1,4 @@
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import GridSearchCV
@@ -42,9 +42,17 @@ def multi_case_classifier_train(df, cases, case_params, case_select='slab'):
     model = GradientBoostingClassifier()
     # train
     est, stndzr = train_estimator(model, params, X_smoted, y_smoted, standardize=True)
+    # training cv score
+    n_folds= 10
+    score_method = 'recall'
+    scores = cross_validate(est, X_smoted, y_smoted, scoring=score_method,
+        cv=n_folds, n_jobs=-1, verbose=1)
+    cv_score = scores['test_score'].mean()
+    print('{} fold cv train score ({}) = {:0.3f}'.format(n_folds,
+            score_method, cv_score))
     # predict
     y_hat, y_proba, importances = predict_classifier(X_test, y_test, est, stndzr)
-    # print scores
+    # print test scores
     method_list = [accuracy_score, recall_score, precision_score]
     print('case: {}'.format(case[0]))
     print_scores(y_test, y_hat, method_list)
