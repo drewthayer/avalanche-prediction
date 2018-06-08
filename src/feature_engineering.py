@@ -2,21 +2,25 @@ import pickle
 import numpy as np
 import pandas as pd
 import os
-import matplotlib.pyplot as plt
-import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 from scipy.stats import gaussian_kde
 from sklearn.neighbors import NearestNeighbors
-
+# my scripts
 from transformation_scripts import water_year_day, water_year_month
+from sqlite3_scripts import connect_to_sql, create_table_sql, write_pandas_to_sql
 
 def engineer_avy_df(avy_df, bc_zone, min_dsize=2):
-    # D scale to ordinal
+    ''' feature engineering for avalanche dataframe
+    input: pandas df
+    arguments: backcountry zone (string), minumum dsize(int)
+    output: pandas df
+    '''
+    # convert D scale to ordinal
     tmp = avy_df['Dsize'].fillna("D0")
     tmp = tmp.apply(lambda x: "D0" if x == "U" else x )
     avy_df['D'] = tmp.apply(lambda x: float(x.split("D")[1]))
 
-    # select avalanches > min_dize
+    # select avalanches > min_dsize
     avy_df['N_AVY'] = np.where(avy_df.D >= min_dsize, avy_df['#'], 0)
 
     # new dataframe and groupby object
@@ -55,22 +59,24 @@ def engineer_avy_df(avy_df, bc_zone, min_dsize=2):
     slab = tmp.apply(lambda x: 1 if ('HS' in set(x[1])) or ('SS' in set(x[1])) else 0)
     zone_df['WET'] = wet
     zone_df['SLAB'] = slab
-
     # set index to timstamp object
     zone_df.set_index(zone_df['dt'], inplace=True)
     zone_df.drop('dt', axis=1, inplace=True)
 
     cols_to_keep = ['N_AVY','MONTH','DOY','N_AVY_24','DSUM_24','P_SLAB','P_WET',
                     'WET', 'SLAB']
-    out = zone_df[cols_to_keep]
+    out_df = zone_df[cols_to_keep]
 
-    return out
+    return out_df
 
 def engineer_wind_df(airport_df, airport_list):
+    ''' feature engineering for wind speed dataframe
+    input: pandas df
+    output: pandas df
+    '''
     airport_df['dt'] = pd.to_datetime(airport_df['datetime'])
     airport_df.set_index(airport_df['dt'], inplace=True)
     airport_df.drop('datetime', axis=1, inplace=True)
-
 
     wind_df = pd.DataFrame()
 
@@ -82,6 +88,12 @@ def engineer_wind_df(airport_df, airport_list):
     return wind_df
 
 def engineer_timelag_features(df, col_list, lag=3):
+    ''' creates new features from previous days for "lag"=n days
+        features in "col_list"
+
+        input: pandas df
+        output: pandas df
+    '''
     lags = range(lag)
     for colname in col_list:
         col = df[colname].values
@@ -94,6 +106,10 @@ def engineer_timelag_features(df, col_list, lag=3):
     return df
 
 def engineer_snotel_df(snotel_df, start_date):
+    ''' feature engineering for snotel dataframe
+    input: pandas df
+    output: pandas df
+    '''
     snotel_df['datetime'] = pd.to_datetime(snotel_df['dt'])
     snotel_df = snotel_df[snotel_df['datetime'] >= start_date]
     # amount
@@ -145,6 +161,11 @@ def engineer_snotel_df(snotel_df, start_date):
     return snow_df
 
 def df_simple_impute(df, method='mean'):
+    ''' impute missing values for numeric coluns in a pandas df
+    options: inpute with mean or zero (input as argument)
+    input: pandas df
+    output: pandas df
+    '''
     # define simple imputer
     def simple_impute(x, val):
         if np.isnan(x):
@@ -163,25 +184,38 @@ def df_simple_impute(df, method='mean'):
             df[col] = column.apply(lambda x: simple_impute(x, val))
     return df
 
+def connect_to_db(db_file):
+    """ create a database connection to a SQLite database
+    input: path to database file
+    output: sql connection
+    """
+    try:
+        conn = sqlite3.connect(db_file)
+        print(sqlite3.version)
+        return conn
+    except Error as e:
+        print(e)
 
 if __name__=='__main__':
     # paths
     current = os.getcwd()
     clean_dir = ''.join([current,'/../data/data-clean/'])
-    # load data
-    avy_df = pd.read_csv(clean_dir + 'avy_data.csv')
-    airport_df = pd.read_csv(clean_dir + 'airport_data_NSanJuan.csv')
-    snotel_df = pd.read_csv(clean_dir + 'snotel_data_NSanJuan.csv')
+    # load data from sql
+    conn = connect_to_sql(current + '/../data/data-clean.db')
+    avy_df = pd.read_sql("select * from avalanche", conn)
+    airport_df = pd.read_sql("select * from airport", conn)
+    snotel_df = pd.read_sql("select * from snotel", conn)
+    conn.close()
 
-    # impute missing values 
+    # impute missing values
     avy_imputed = df_simple_impute(avy_df, method='mean')
     airport_imputed = df_simple_impute(airport_df, method='mean')
     snotel_imputed = df_simple_impute(snotel_df, method='mean')
 
-    # engineer CAIC data
+    # engineer CAIC data for specific zone
     zone_df = engineer_avy_df(avy_imputed, 'Northern San Juan', min_dsize=2)
 
-    # time range:
+    # select time range:
     start_date = zone_df.index.min()
     end_date = zone_df.index.max()
 
@@ -192,27 +226,21 @@ if __name__=='__main__':
     # engineer snotel data
     snow_df = engineer_snotel_df(snotel_imputed, start_date)
     snow_df = df_simple_impute(snow_df, method='zero') # impute zero for engineered features
-    pickle.dump( snow_df, open( "pkl/snow_df.p", "wb" ) )
 
-    stationnames = ['618_mcclure_pass',
-                    '669_north_lost_trail',
-                    '737_schofield_pass',
-                    '542_independence_pass',
-                    '369_brumley',
-                    '547_ivanhoe']
-
-    # to test, use only one station
+    # to test, use only most representative station
     snow_df = snow_df[snow_df.STATION == '713']
 
-    ''' assemble feature matrix '''
+    #assemble feature matrix
     merge = pd.merge(snow_df, wind_df, how='left', left_index=True, right_index=True)
     merge_all = pd.merge(merge, zone_df, how='left', left_index=True, right_index=True)
 
-    # remove non-numeric columns
+    # remove non-numeric columns, impute remaining nans with zero
     merge_all.drop('STATION', axis=1, inplace=True)
-
     merge_imputed = df_simple_impute(merge_all, method='zero')
 
-
-    ''' save to pickle '''
-    pickle.dump( merge_imputed, open( "pkl/nsanjuan_data.p", "wb" ) )
+    #save to sql db
+    db = current + '/../data/data-engineered.db'
+    tablename = 'nsanjuan'
+    conn = connect_to_sql(db)
+    write_pandas_to_sql(conn, tablename, merge_imputed)
+    conn.close()

@@ -1,8 +1,6 @@
 import os
 import pandas as pd
 import sqlite3
-
-import sqlite3
 from sqlite3 import Error
 
 
@@ -27,23 +25,12 @@ def connect_to_db(db_file):
     #finally:
     #    conn.close()
 
-def create_table(conn, tablename):
+def create_table(conn, tablename, sql):
     cursor = conn.cursor()
-
-    sql_command = """
-    CREATE TABLE IF NOT EXISTS tablename (
-    date DATE,
-    bc_zone VARCHAR(20),
-    type VARCHAR(3),
-    dsize FLOAT,
-    n_avy INTEGER);"""
-
-    cursor.execute(sql_command)
-    conn.close()
+    cursor.execute(sql)
 
 def write_pandas_to_sql(conn, tablename, df):
     df.to_sql(tablename, conn, if_exists='replace')
-    conn.close()
 
 
 def read_from_db(conn, query):
@@ -72,11 +59,20 @@ if __name__=='__main__':
     db = current + '/../data/data-clean-db/avalanche.db'
     tablename = 'avalanche'
     conn = connect_to_db(db)
-    create_table(conn, tablename)
+
+    sql = """
+    CREATE TABLE IF NOT EXISTS tablename (
+    date DATE,
+    bc_zone VARCHAR(20),
+    type VARCHAR(3),
+    dsize FLOAT,
+    n_avy INTEGER);"""
+
+    create_table(conn, tablename, sql)
 
     # write df to sql
-    conn = connect_to_db(db)
     write_pandas_to_sql(conn, tablename, avy_df)
+    conn.close()
 
     ''' read from sql db '''
     query = """SELECT datetime, Dsize from avalanche LIMIT 5"""
