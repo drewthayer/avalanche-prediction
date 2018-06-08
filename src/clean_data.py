@@ -1,5 +1,7 @@
 import os
 import pandas as pd
+import sqlite3
+from sqlite3 import Error
 from cleaning_scripts import clean_snow_data, remove_airtemp_outliers, clean_airport_data
 
 def read_and_concat_snotel(directory, station_list):
@@ -44,6 +46,46 @@ def read_caic_data(directory, filename):
 
     return avy_df
 
+def connect_to_db(db_file):
+    """ create a database connection to a SQLite database """
+    try:
+        conn = sqlite3.connect(db_file)
+        print(sqlite3.version)
+        return conn
+    except Error as e:
+        print(e)
+    #finally:
+    #    conn.close()
+
+def create_table(conn, tablename):
+    cursor = conn.cursor()
+
+    sql_command = """
+    CREATE TABLE IF NOT EXISTS tablename (
+    date DATE,
+    bc_zone VARCHAR(20),
+    type VARCHAR(3),
+    dsize FLOAT,
+    n_avy INTEGER);"""
+
+    cursor.execute(sql_command)
+    conn.close()
+
+def write_pandas_to_sql(conn, tablename, df):
+    df.to_sql(tablename, conn, if_exists='replace')
+    conn.close()
+
+
+def read_from_db(conn, query):
+    cursor = conn.cursor()
+
+    cursor.execute(query)
+    result = cursor.fetchall()
+    for r in result:
+        print(r)
+
+    conn.close()
+
 if __name__=='__main__':
     # paths
     current = os.getcwd()
@@ -79,10 +121,13 @@ if __name__=='__main__':
 
     ''' write data to file '''
     # write clean data to new csv
-    snotel_df.to_csv(clean_dir + 'snotel_data_NSanJuan.csv')
-    airport_df.to_csv(clean_dir + 'airport_data_NSanJuan.csv')
+    # snotel_df.to_csv(clean_dir + 'snotel_data_NSanJuan.csv')
+    # airport_df.to_csv(clean_dir + 'airport_data_NSanJuan.csv')
     #avy_df.to_csv(clean_dir + 'avy_data.csv')
 
     # to append:
     #with open(clean_dir + 'airport_data.csv', 'a') as f:
     #    airport_df.to_csv(f, header=False)
+
+
+    ''' write data to sql database'''
