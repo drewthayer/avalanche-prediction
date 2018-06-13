@@ -9,7 +9,7 @@ def connect_to_sql(db_file):
     """
     try:
         conn = sqlite3.connect(db_file)
-        print(sqlite3.version)
+        print('sqlite {}'.format(sqlite3.version))
         return conn
     except Error as e:
         print(e)

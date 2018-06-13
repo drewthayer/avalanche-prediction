@@ -16,6 +16,17 @@ def water_year_day(day):
         day2 = day + 92
     return day2
 
+def set_df_index_from_datetime(df, colname):
+    ''' sets index of a pandas df from a column of datetime strings
+        new index is datetime objects
+        drops datatime string column
+        returns df
+    '''
+    df['dt'] = pd.to_datetime(df[colname])
+    df.set_index(df['dt'], inplace=True)
+    df.drop([colname, 'dt'], axis=1, inplace=True)
+    return df
+
 def oversample(data_df, colname, n=4):
 
     ''' oversample data based on column name
