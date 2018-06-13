@@ -2,9 +2,7 @@ import pickle
 import numpy as np
 import pandas as pd
 import os
-from sklearn.preprocessing import OneHotEncoder
-from scipy.stats import gaussian_kde
-from sklearn.neighbors import NearestNeighbors
+import sys
 # my scripts
 from transformation_scripts import water_year_day, water_year_month
 from sqlite3_scripts import connect_to_sql, create_table_sql, write_pandas_to_sql
@@ -184,25 +182,22 @@ def df_simple_impute(df, method='mean'):
             df[col] = column.apply(lambda x: simple_impute(x, val))
     return df
 
-def connect_to_db(db_file):
-    """ create a database connection to a SQLite database
-    input: path to database file
-    output: sql connection
-    """
-    try:
-        conn = sqlite3.connect(db_file)
-        print(sqlite3.version)
-        return conn
-    except Error as e:
-        print(e)
-
 if __name__=='__main__':
+    ''' set name variable here '''
+    #sys.argv[1] = zonename
+    zonename = 'nsj'
+    # labels, ids corresponding with each zone
+    zone_labels = {'aspen': 'Aspen', 'nsj':'Northern San Juan'}
+    zone_stationid = {'aspen':'542', 'nsj':'713'}
     # paths
     current = os.getcwd()
-    clean_dir = ''.join([current,'/../data/data-clean/'])
-    # load data from sql
-    conn = connect_to_sql(current + '/../data/data-clean.db')
+
+    # load avalanche data from sql
+    conn = connect_to_sql(current + '/../data/data-caic.db')
     avy_df = pd.read_sql("select * from avalanche", conn)
+
+    # load zone snow, weather data from sql
+    conn = connect_to_sql(current + '/../data/data-{}.db'.format(zonename))
     airport_df = pd.read_sql("select * from airport", conn)
     snotel_df = pd.read_sql("select * from snotel", conn)
     conn.close()
@@ -213,14 +208,14 @@ if __name__=='__main__':
     snotel_imputed = df_simple_impute(snotel_df, method='mean')
 
     # engineer CAIC data for specific zone
-    zone_df = engineer_avy_df(avy_imputed, 'Northern San Juan', min_dsize=2)
+    zone_df = engineer_avy_df(avy_imputed, zone_labels[zonename], min_dsize=2)
 
     # select time range:
     start_date = zone_df.index.min()
     end_date = zone_df.index.max()
 
     # engineer wind data
-    airport_list = ['montrose']
+    airport_list = [x for x in airport_df.airport.unique()]
     wind_df = engineer_wind_df(airport_imputed, airport_list)
 
     # engineer snotel data
@@ -228,7 +223,7 @@ if __name__=='__main__':
     snow_df = df_simple_impute(snow_df, method='zero') # impute zero for engineered features
 
     # to test, use only most representative station
-    snow_df = snow_df[snow_df.STATION == '713']
+    snow_df = snow_df[snow_df.STATION == zone_stationid[zonename]]
 
     #assemble feature matrix
     merge = pd.merge(snow_df, wind_df, how='left', left_index=True, right_index=True)
@@ -240,7 +235,7 @@ if __name__=='__main__':
 
     #save to sql db
     db = current + '/../data/data-engineered.db'
-    tablename = 'nsanjuan'
+    tablename = zonename
     conn = connect_to_sql(db)
     write_pandas_to_sql(conn, tablename, merge_imputed)
     conn.close()

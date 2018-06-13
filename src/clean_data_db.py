@@ -55,23 +55,26 @@ if __name__=='__main__':
     caic_dir = ''.join([current,'/../data/data-caic/'])
     clean_dir = ''.join([current,'/../data/data-clean-db/'])
 
-    # read snotel data
+    # stations and airport files for different zones
     stationnames_aspen = ['618_mcclure_pass',
                         '669_north_lost_trail',
                         '737_schofield_pass',
                         '542_independence_pass',
                         '369_brumley',
                         '547_ivanhoe']
-
-    airportfiles_aspen = []
+    airportfiles_aspen = ['aspen_pitkin_airport_20060101_current.csv',
+                   'leadville_lake_airport_20090101.csv',
+                   'telluride_airport_20090101_20180417.csv']
 
     stationnames_nsj = ['713_red_mtn_pass',
-                        '538_idarado',]
+                        '538_idarado']
+    airportfiles_nsj = ['montrose_airport_20060101_20081231.csv',
+                        'montrose_airport_20090101_20180405.csv']
+
     snotel_df = read_and_concat_snotel(snotel_dir, stationnames_nsj)
 
     # read airport wind speed data
-    airportfiles_nsj = ['montrose_airport_20060101_20081231.csv',
-                        'montrose_airport_20090101_20180405.csv']
+
     airport_df, name = read_and_concat_airport(lcd_dir, airportfiles_nsj)
 
     # read avalanche data
