@@ -8,8 +8,12 @@ import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import sys
 import pdb
 
+from transformation_scripts import set_df_index_from_datetime
+from sqlite3_scripts import connect_to_sql
 from modeling_scripts import train_test_split_time, train_estimator
 from modeling_scripts import predict_classifier, print_scores
 
@@ -55,16 +59,24 @@ def multi_case_classifier_predict(df, cases, ests, stdzrs,
 
 
 if __name__=='__main__':
-    # load data
-    df = pickle.load( open( 'pkl/nsanjuan_data.p', 'rb'))
+    zonename = sys.argv[1]
+    # load data from sql as df, drop n_avy column
+    current = os.getcwd()
+    conn = connect_to_sql(current + '/../data/data-engineered.db')
+    df = pd.read_sql("select * from {}".format(zonename), conn)
+
+    # drop n_avy column and set index to datetime
     df.drop('N_AVY', axis=1, inplace=True)
-    #df.drop('MONTH', axis=1, inplace=True)
+    df = set_df_index_from_datetime(df, 'datetime')
+
     # fill na with zero in case any not imputed
     df.fillna(0, inplace=True)
 
     #load fitted models
-    est_slab, std_slab = pickle.load( open( 'best-ests/nsj_best_est_gbc_SLAB_scaled.p', 'rb'))
-    est_wet, std_wet = pickle.load( open( 'best-ests/nsj_best_est_gbc_WET_scaled.p', 'rb'))
+    slabfile = 'best-ests/{}_best_est_gbc_SLAB.p'.format(zonename)
+    wetfile = 'best-ests/{}_best_est_gbc_WET.p'.format(zonename)
+    est_slab, std_slab = pickle.load( open( slabfile, 'rb'))
+    est_wet, std_wet = pickle.load( open( wetfile, 'rb'))
 
     ''' N_AVY when case = slab/wet '''
     params = {
@@ -79,4 +91,4 @@ if __name__=='__main__':
 
     # save outputs to pkl
     pickle.dump(outputs,
-            open('pkl/nsj_gbc_smoted_scaled_output.p','wb'))
+            open('outputs/{}_gbc_output.p'.format(zonename),'wb'))
