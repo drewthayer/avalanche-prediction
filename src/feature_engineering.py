@@ -186,7 +186,7 @@ if __name__=='__main__':
     ''' set name variable from command line
         names can be 'aspen' or 'nsj' '''
 
-    zonename = sys.argv[1]
+    zonename = sys.argv[1] # 'aspen' or 'nsj'
     # labels, ids corresponding with each zone
     zone_labels = {'aspen': 'Aspen', 'nsj':'Northern San Juan'}
     zone_stationid = {'aspen':'542', 'nsj':'713'}
