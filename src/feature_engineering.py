@@ -183,9 +183,10 @@ def df_simple_impute(df, method='mean'):
     return df
 
 if __name__=='__main__':
-    ''' set name variable here '''
-    #sys.argv[1] = zonename
-    zonename = 'nsj'
+    ''' set name variable from command line
+        names can be 'aspen' or 'nsj' '''
+
+    zonename = sys.argv[1]
     # labels, ids corresponding with each zone
     zone_labels = {'aspen': 'Aspen', 'nsj':'Northern San Juan'}
     zone_stationid = {'aspen':'542', 'nsj':'713'}
@@ -234,7 +235,7 @@ if __name__=='__main__':
     merge_imputed = df_simple_impute(merge_all, method='zero')
 
     #save to sql db
-    db = current + '/../data/data-engineered.db'
+    db = current + '/../data/data-engineered-test.db'
     tablename = zonename
     conn = connect_to_sql(db)
     write_pandas_to_sql(conn, tablename, merge_imputed)
