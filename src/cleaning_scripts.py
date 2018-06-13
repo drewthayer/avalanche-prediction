@@ -54,9 +54,6 @@ def clean_snow_data(dataframe):
     # drop datetime string column
     snow_df.drop(['dt_string'], axis=1, inplace=True)
 
-    #set snow df index to dt
-    snow_df.set_index(snow_df.dt, inplace=True)
-
     return snow_df
 
 def clean_airport_data(df,name):

@@ -235,7 +235,7 @@ if __name__=='__main__':
     merge_imputed = df_simple_impute(merge_all, method='zero')
 
     #save to sql db
-    db = current + '/../data/data-engineered-test.db'
+    db = current + '/../data/data-engineered.db'
     tablename = zonename
     conn = connect_to_sql(db)
     write_pandas_to_sql(conn, tablename, merge_imputed)
