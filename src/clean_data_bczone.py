@@ -55,6 +55,7 @@ def read_zone_data_to_sql(zonename, zonedata, snotel_dir, lcd_dir):
     conn.close()
 
 if __name__=='__main__':
+    zone = sys.argv[1]
     # define paths
     current = os.getcwd()
     snotel_dir = ''.join([current,'/../data/data-snotel/'])
@@ -79,6 +80,5 @@ if __name__=='__main__':
     zonedata = {'aspen': [stations_aspen, airportfiles_aspen],
                 'nsj': [stations_nsj, airportfiles_nsj]}
 
-    # read data, write to sql, input from command line 
-    zone = sys.argv[1]
+    # read data, write to sql, input from command line
     read_zone_data_to_sql('nsj', zonedata[zone], snotel_dir, lcd_dir)
