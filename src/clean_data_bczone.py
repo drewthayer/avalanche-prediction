@@ -79,5 +79,6 @@ if __name__=='__main__':
     zonedata = {'aspen': [stations_aspen, airportfiles_aspen],
                 'nsj': [stations_nsj, airportfiles_nsj]}
 
-    # read, write to sql 
-    read_zone_data_to_sql('nsj', zonedata, snotel_dir, lcd_dir)
+    # read data, write to sql, input from command line 
+    zone = sys.argv[1]
+    read_zone_data_to_sql('nsj', zonedata[zone], snotel_dir, lcd_dir)
