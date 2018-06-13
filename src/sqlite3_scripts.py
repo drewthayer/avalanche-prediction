@@ -22,12 +22,16 @@ def write_pandas_to_sql(conn, tablename, df):
     df.to_sql(tablename, conn, if_exists='replace')
 
 
-def read_from_sql(conn, query):
+def read_print_from_sql(conn, query):
     cursor = conn.cursor()
-
     cursor.execute(query)
     result = cursor.fetchall()
     for r in result:
         print(r)
 
-    conn.close()
+def read_from_sql(conn, query):
+    cursor = conn.cursor()
+    cursor.execute(query)
+    result = cursor.fetchall()
+    out = [r for r in result]
+    return out
