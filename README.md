@@ -179,7 +179,7 @@ __model training (Aspen): binary cross-entropy loss__
 - test results:
 
 |   | mlp: slab | gradient boosting: slab | | mlp: wet | gradient boosting: wet|
-|-----|-----|-----|---|---|-----|----|
+|-----|-----|-----|----|----|-----|
 | accuracy | 0.956 | 0.938 | | 0.825 | 0.938 |
 | precision | 0.786 | 0.851 | | 0.130 | 0.476 |
 | recall | 0.990 | 0.932 | | 1.00 | 0.625 |
