@@ -140,6 +140,12 @@ __best model results:__
 | recall | 0.932 | 0.625 | 0.880 |
 
 __best model parameters:__ (determined by grid search on AWS EC2, optimized for recall)
+
+ - the best parameters differ between models, but generally include:
+   - large number of boosting stages
+   - constraints on minimum samples and splits at each leaf (regularization)
+   - stochastic gradient boosting (each stages uses a random sub-sample of the observations)
+
  - gradient boosting classifier, slab:
    - {'criterion': 'friedman_mse', 'learning_rate': 0.01, 'loss': 'exponential', 'max_features': 'log2', 'min_samples_leaf': 4, 'min_samples_split': 6, 'n_estimators': 400, 'subsample': 0.8}
 
@@ -186,7 +192,7 @@ __model training (Aspen): binary cross-entropy loss__
 
 __Discussion__: preliminary implementation of a 4-hidden-layer multi-layer-perceptron neural network indicates that better accuracy and potentially better recall can be acheived, but the neural network is likely over-fitting the training data. Much tuning is needed.
 
-![](figs/pub_figs/slideshow_credits.png)
+![](figs/pub_figs/slideshow_credits2.png)
 
 ### References:
 Data:
@@ -201,7 +207,8 @@ Images:
  - opening image: Staying Alive in Avalanche Terrain, Bruce Tremper, The Mountaineers Books
 - sensor images: NRCS, NOAA
 - slab example: The Avalanche Review, VOL. 29, NO. 3, FEBRUARY
--  wet slide example:  Colorado Avalanche Information Center
+- wet slide example:  Colorado Avalanche Information Center
+- multi-layer-perceptron example: https://github.com/ankonzoid/NN-from-scratch
 - closing shot: Annie Hancock in Rocky Mountain National Park, CO. photo: Drew Thayer
 
 
