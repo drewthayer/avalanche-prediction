@@ -70,7 +70,7 @@ __best model: random forest classifier__
 
 ### Feature augmentation: probability of slab/ wet avalanches:
   - slab and wet avalanches have overlapping, yet different seasons:
-<img alt='kde hist' src='figs/eda/kde_hist_scaled.png' width='500'>
+<img alt='kde hist' src='figs/eda/kde_hist_scaled.png' width='600'>
 
   - relative probability modeled as Gaussian KDE function:
   - p(slab), p(wet) as function of day-of-year
@@ -146,17 +146,45 @@ __best model parameters:__ (determined by grid search on AWS EC2, optimized for 
  - gradient boosting classifier, wet:
    - {'criterion': 'friedman_mse', 'learning_rate': 0.05, 'loss': 'deviance', 'max_features': 'log2', 'min_samples_leaf': 5, 'min_samples_split': 5, 'n_estimators': 600, 'subsample': 0.4}
 
-__check against naive model:__
+__check against naive model (sanity check):__
 
-naive: ones
-accuracy: 0.282
-precision: 0.288
-recall: 0.928
+- guessing 1 every time has bad precision, guessing 0 evert time has horrible recall
 
-naive: zeros
-accuracy: 0.717
-precision: 1.0
-recall: 0.0714
+|   | naive (ones) | naive (zeros) | gradient boosting |
+|-----|-----|-----|-----|
+| accuracy | 0.282 | 0.717 | 0.920 |
+| precision | 0.288 | 1.0 | 0.860 |
+| recall | 0.928 | 0.071 | 0.880 |
+
+
+### extension: prediction with a neural network
+__implementation of a multi-layer-perceptron using Keras__
+
+<img alt='kde hist' src='figs/pub_figs/neural_network_img.png' width='300'>
+
+_brief overview: a multi-layer-perceptron neural network uses a layer of 'hidden' decision gates (a.k.a neurons) to solve a regression or classification problem. All neurons in the network have a weight which is solved for during forward propagation of the problem, then updated with back-propagation of the misfit/mis-classification via gradient descent._
+
+_The hidden neurons are 'hidden' in the sense that the values of their weights are not interpretable with respect to the target values, but their presence gives the network great flexibility in solving non-linear problems._
+
+__preliminary model:__
+ - sequential mlp with four hidden dense layers
+ - sigmoid activation
+
+__model training (Aspen): binary cross-entropy loss__
+
+| Slab model training | Wet model training |
+|----|----|
+| ![](figs/keras/aspen_slab_training_loss.png) | ![](figs/keras/aspen_wet_training_loss.png) |
+
+- test results:
+
+|   | mlp: slab | gradient boosting: slab | | mlp: wet | gradient boosting: wet|
+|-----|-----|-----|---|---|-----|----|
+| accuracy | 0.956 | 0.938 | | 0.825 | 0.938 |
+| precision | 0.786 | 0.851 | | 0.130 | 0.476 |
+| recall | 0.990 | 0.932 | | 1.00 | 0.625 |
+
+__Discussion__: preliminary implementation of a 4-hidden-layer multi-layer-perceptron neural network indicates that better accuracy and potentially better recall can be acheived, but the neural network is likely over-fitting the training data. Much tuning is needed.
 
 ![](figs/pub_figs/slideshow_credits.png)
 
@@ -185,13 +213,13 @@ __directory structure:__
 │   │   ├── raw LCD airport data (.csv)
 │   ├── data-caic
 │   │   ├── raw CAIC data (.csv)
-│   ├── data-clean
-│   │   ├── cleaned data (.csv)
-│   └── data-snotel
-│       ├── raw snotel files (.csv)
+│   ├── data-snotel
+│   │   ├── raw snotel files (.csv)
+│   ├── data-caic.db
+│   ├── data-aspen.db
+│   ├── data-nsj.db
 ├── data_sources.md
 ├── development
-│   ├── py scripts and .pkl files
 ├── figs
 │   ├── all figures
 ├── model_features.md
