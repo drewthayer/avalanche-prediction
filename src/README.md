@@ -3,45 +3,52 @@
 ### data: .csv files in /data/
 
 ### data cleaning
-  __clean_data.py__
+  __clean_data_caic.py__
    - input: .csv
-   - output: .csv
-   - actions: read data, make format corrections, save as .csv files
+   - output: sqlite database (data-caic.db)
+   - actions: read avy data, make format corrections, save as .csv files
    - script dependencies:
-      - cleaning_scripts.py
+      - cleaning_scripts.py, sqlite3_scripts.py
+
+  __clean_data_bczone.py__
+   - input: .csv
+   - output: sqlite database (data-aspen.db, data-nsj.db)
+   - actions: read snotel and wind data for a backcountry zone, make format corrections, save as .csv files
+   - script dependencies:
+      - cleaning_scripts.py, sqlite3_scripts.py
 
 ### feature engineering
   __feature_engineering.py__
-   - input: .csv
-   - output: .pkl
+   - input: sqlite database for zone
+   - output: sqlite database (data-engineered.db), one table for each bc zone
    - actions:
      - engineer features
      - convert dates to water year
      - engineer timeseries lag features
      - impute NaNs (with mean or other value)
    - script dependencies:
-      - transformation_scripts.py
+      - transformation_scripts.py, sqlite3_scripts.py
 
 ### modeling
-  __train_classifier_gbc.py__ (or train_classifier_rfc.py)
-   - input: (.pkl)
+  __train_classifier.py__ (or train_classifier_rfc.py)
+   - input: sqlite database
      - cleaned and engineered feature matrix as pandas df
-   - output:
-     - fitted estimator and standardizer, as pickle
+   - output: saved as .pkl in /best-ests/
+     - fitted estimators and standardizers
      - saves one set for each of two cases: 'slab' and 'wet'
    - script dependencies:
-      - transformation_scripts.py, modeling_scripts.py
+      - transformation_scripts.py, modeling_scripts.py, sqlite3_scripts.py
 
   __predict_fitted_classifier.py__
-   - input: (.pkl)
+   - input: sqlite database, .pkl files
      - cleaned and engineered feature matrix as pandas df
      - fitted estimator and standardizer
-   - output:
+   - output: saved as .pkl in /outputs/
      - predicted binary and predicted probability for both cases
      - feature names and importances
 
   __output_classifier.py__
-   - input: (.pkl)
+   - input: .pkl from /outputs/
      - outputs from predictions
    - output:
      - figures
@@ -57,39 +64,7 @@
     - script dependencies
       - transformation_scripts.py
   - ts_results_plot.py
-    - makes a timeseries plot of results: actual and predicted 
-
-~~~
-/project
-  /data
-      .csv files
-  /src
-    /pkl
-        .pkl files
-    data prep:
-    clean_data.py
-        functions:
-
-        scripts:
-            cleaning_scripts.py_
-                clean_airport_data.py (removes hourly data: only rows with DAILY columns )
-                clean_snow_data.py
-                remove_airtemp_outliers.py
-    feature_engineering.py_
-        transformation_scripts.py
-            water_year_day.py
-            water_year_month.py
-            oversample.py
-
-    modeling: (DROPNA HERE )
-    run_model.py
-    run_model_slab_wet.py
-    run_model_2options.py
-
-    model outputs:
-    output.py
-
-~~~
+    - makes a timeseries plot of results: actual and predicted
 
 __dataframe sizes:__
 
@@ -111,35 +86,41 @@ feature_engineering
 
 __directory structure:__
 ~~~
+├── README.md
 ├── ROC.py
 ├── best-ests
-│   ├── pickled trained estimators (.pkl)
-├── clean_data.py
+│   ├── aspen_best_est_gbc_SLAB.p
+│   └── aspen_best_est_gbc_WET.p
+│
+├── clean_data_bczone.py
+├── clean_data_caic.py
 ├── cleaning_scripts.py
 ├── eda
-│   ├── Aspen_navy_ts.png
 │   ├── eda_avy.py
 │   ├── eda_data.py
 │   └── eda_snow.py
+│
 ├── feature_diagnostics.py
 ├── feature_engineering.py
-├── feature_hists
-│   ├── histograms for aspen area (.png)
+├── feature_hists_aspen
+│   ├── histograms (.png)
+│
 ├── feature_hists_nsj
-│   ├── histograms for nsj area (.png)
+│   ├── histograms (.png)
+│
 ├── kde_probabilities.py
-├── main.py
+├── model_features.md
+├── modeling_notes.md
 ├── modeling_scripts.py
-├── output.py
 ├── output_classifier.py
-├── pkl
-│   ├── pickle files (.p)
+├── outputs
+│   └── aspen_gbc_output.p
+│
 ├── plotting_scripts.py
 ├── predict_fitted_classifier.py
 ├── predict_partial_dependence.py
-├── run_2models_classification.py
+├── sqlite3_scripts.py
 ├── train_classifier.py
-├── train_classifier_gbc.py
 ├── train_classifier_gridsearch_gbc.py
 ├── train_classifier_gridsearch_rfc.py
 ├── transformation_scripts.py
