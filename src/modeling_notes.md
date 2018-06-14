@@ -462,3 +462,16 @@ case: WET
 test accuracy_score = 0.952
 test recall_score = 0.654
 test precision_score = 0.436
+
+## Keras mlp implementation
+Training results: aspen, slab
+training accuracy = 0.976
+test accuracy_score = 0.956
+test recall_score = 0.990
+test precision_score = 0.786
+
+Training results: aspen, wet
+training accuracy = 0.941
+test accuracy_score = 0.825
+test recall_score = 1.000
+test precision_score = 0.130
