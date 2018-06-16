@@ -11,10 +11,10 @@ import numpy as np
 import os
 import sys
 
-from helper_functions.transformation_scripts import smote, set_df_index_from_datetime
-from helper_functions.sqlite3_scripts import connect_to_sql
-from helper_functions.modeling_scripts import train_test_split_time, train_estimator
-from helper_functions.modeling_scripts import predict_classifier, print_scores
+from scripts.transformation_scripts import smote, set_df_index_from_datetime
+from scripts.sqlite3_scripts import connect_to_sql
+from scripts.modeling_scripts import train_test_split_time, train_estimator
+from scripts.modeling_scripts import predict_classifier, print_scores
 
 def multi_case_classifier_train(df, cases, case_params, case_select='slab'):
     ''' case: list, length = # of cases, items = list of [a,b] and [b,a]

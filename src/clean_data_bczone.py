@@ -1,8 +1,8 @@
 import os
 import pandas as pd
 # my scripts
-from cleaning_scripts import clean_snow_data, remove_airtemp_outliers, clean_airport_data
-from sqlite3_scripts import connect_to_sql, create_table_sql, write_pandas_to_sql
+from scripts.cleaning_scripts import clean_snow_data, remove_airtemp_outliers, clean_airport_data
+from scripts.sqlite3_scripts import connect_to_sql, create_table_sql, write_pandas_to_sql
 
 def read_and_concat_snotel(directory, station_list):
     cols_raw = ['dt_string', 'swe_start_in', 'precip_start_in', 'airtemp_max_F', 'airtemp_min_F',

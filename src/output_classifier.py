@@ -6,7 +6,8 @@ import scipy.stats as stats
 from ROC import ROC
 from sklearn.metrics import precision_recall_curve
 
-from plotting_scripts import feature_importances, output_histograms_classification
+from scripts.plotting_scripts import feature_importances
+from scripts.plotting_scripts import output_histograms_classification
 
 def results_ts_plot(df, slab_proba, wet_proba):
     # get train, test avy data

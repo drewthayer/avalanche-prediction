@@ -231,8 +231,4 @@ if __name__=='__main__':
     wet_proba = y_proba_l[1][:,1]
 
     # ts plot
-    #results_ts_plot(df, slab_proba, wet_proba)
-
-    #results_ts_plot_2(df, slab_proba, wet_proba)
-
     results_ts_plot_4(df, slab_proba, wet_proba)

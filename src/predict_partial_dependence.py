@@ -13,7 +13,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import pdb
 
-from modeling_scripts import train_test_split_time, predict_classifier,
+from scripts.modeling_scripts import train_test_split_time, predict_classifier,
         print_scores
 
 
@@ -100,7 +100,3 @@ if __name__=='__main__':
     'n_oversamps': [1,1]}
 
     outputs = multi_case_partial_dependence(df, **params)
-
-    # save outputs to pkl
-    #pickle.dump(outputs,
-    #        open('pkl/nsj_gbc_smoted_scaled_output.p','wb'))
