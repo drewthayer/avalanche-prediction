@@ -10,7 +10,7 @@ font = {'family' : 'normal',
 import matplotlib
 matplotlib.rc('font', **font)
 
-from transformation_scripts import water_year_day
+from scripts.transformation_scripts import water_year_day
 
 def kde_probabilities(dataframe, feature_vals, feature_col, target_col, xx, smooth):
     probs_list = []

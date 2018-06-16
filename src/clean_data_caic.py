@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 # my scripts
-from sqlite3_scripts import connect_to_sql, write_pandas_to_sql
+from scripts.sqlite3_scripts import connect_to_sql, write_pandas_to_sql
 
 def read_caic_data(directory, filename):
     ''' reads caic data from .csv, adds datetime as index

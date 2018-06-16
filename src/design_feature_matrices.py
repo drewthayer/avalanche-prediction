@@ -4,9 +4,9 @@ import numpy as np
 import os
 import sys
 
-from sqlite3_scripts import connect_to_sql
-from transformation_scripts import smote, set_df_index_from_datetime
-from modeling_scripts import train_test_split_time
+from scripts.sqlite3_scripts import connect_to_sql
+from scripts.transformation_scripts import smote, set_df_index_from_datetime
+from scripts.modeling_scripts import train_test_split_time
 
 if __name__=='__main__':
     zonename = sys.argv[1] # 'aspen' or 'nsj'
@@ -43,7 +43,7 @@ if __name__=='__main__':
     X_train, y_train, X_test, y_test = train_test_split_time(data_df,
         '2016-06-01', case[0])
 
-    # oversample train data with SMOTE 
+    # oversample train data with SMOTE
     X_smoted, y_smoted = smote(X_train.values, y_train.values, 0.60, k=None)
 
     # write to pkl

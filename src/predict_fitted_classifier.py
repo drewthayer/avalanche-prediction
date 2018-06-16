@@ -12,10 +12,10 @@ import os
 import sys
 import pdb
 
-from transformation_scripts import set_df_index_from_datetime
-from sqlite3_scripts import connect_to_sql
-from modeling_scripts import train_test_split_time, train_estimator
-from modeling_scripts import predict_classifier, print_scores
+from scripts.transformation_scripts import set_df_index_from_datetime
+from scripts.sqlite3_scripts import connect_to_sql
+from scripts.modeling_scripts import train_test_split_time, train_estimator
+from scripts.modeling_scripts import predict_classifier, print_scores
 
 def multi_case_classifier_predict(df, cases, ests, stdzrs,
                 n_oversamps, c_true, c_pred):
@@ -78,7 +78,7 @@ if __name__=='__main__':
     est_slab, std_slab = pickle.load( open( slabfile, 'rb'))
     est_wet, std_wet = pickle.load( open( wetfile, 'rb'))
 
-    ''' N_AVY when case = slab/wet '''
+    # predict with two cases
     params = {
     'cases': [['SLAB','WET'], ['WET','SLAB']],
     'ests': [est_slab, est_wet],

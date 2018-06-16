@@ -4,8 +4,8 @@ import pandas as pd
 import os
 import sys
 # my scripts
-from transformation_scripts import water_year_day, water_year_month
-from sqlite3_scripts import connect_to_sql, create_table_sql, write_pandas_to_sql
+from scripts.transformation_scripts import water_year_day, water_year_month
+from scripts.sqlite3_scripts import connect_to_sql, create_table_sql, write_pandas_to_sql
 
 def engineer_avy_df(avy_df, bc_zone, min_dsize=2):
     ''' feature engineering for avalanche dataframe
