@@ -18,7 +18,7 @@ __Colorado Avalanche Information Center data__ (Colorado Department of Natural R
 |----|----|
 |<img alt="caic zones" src="/figs/pub_figs/CAIC_zones.png" width='300'> | <img alt="caic zones" src="/figs/eda/zone_histogram.png" width='300'> |
 
-avalanche observation data back to 1980:
+avalanche observation data back to 2000:
 
 <img alt="caic zones" src="/figs/pub_figs/caic_example.png" width='300'>
 
