@@ -77,7 +77,8 @@ __dataframe sizes:__
 
 clean_data outputs:
  - avy_df: (10151, 40)
- - snotel_df: (74532, 10), without airtemp cleaning: (74636, 10)
+ - snotel_df: (74532, 10), without air temperature cleaning: (74636, 10)
+    - 104 outliers removed, 0.14%
  - airport_df: (7474,4)
 
 feature_engineering
