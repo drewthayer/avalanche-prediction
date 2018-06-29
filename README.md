@@ -75,7 +75,7 @@ __best model: random forest classifier__
   - relative probability modeled as Gaussian KDE function:
   - p(slab), p(wet) as function of day-of-year
     - _for water year, starting on october 1_
-  - $\Sigma (p_{slab}, p_{wet}) = p_{avalanche}$
+  - <img alt='kde hist' src='figs/pub_figs/eqn_slab_wet_sum.png' width='200'>
 
 ### ensemble of 2 models:
 <img alt='model flow' src='figs/pub_figs/model_flowchart.png' width='500'>
