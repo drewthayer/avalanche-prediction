@@ -54,12 +54,12 @@ __classification model:__
 <img alt="caic zones" src="/figs/pub_figs/math-figs/13-Sigmoid.gif" width='200'>
 
  - testing two models:
-   - Random Forest Classifier
-   - Gradient Boosting Classifier
+   - Random Forest Classifier (_e.g. bootstrap aggregation of decision trees with random sub-sampling in feature space_)
+   - Gradient Boosting Classifier (_e.g. ensemble of weak learners trained sequentially_)
    - (implemented in Scikit-Learn, python 3.5)
 
-__best model: random forest classifier__
- - test accuracy = 0.942
+__best model: gradient boosting classifier__
+ - test accuracy = 0.92
  - test recall = 0.88
 
 ### feature engineering
